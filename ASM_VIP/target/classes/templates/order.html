@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html th:replace="~{/layout::view(~{::title}, ~{::body}, ~{::style})}" lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đơn Hàng | Luxury Watches</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <style>
+      body {
+        font-family: "Roboto", "Arial", sans-serif;
+        color: #1a1a1a;
+        background-color: #f8f9fa;
+      }
+
+      /* Page Header Styling */
+      .page-header {
+        position: relative;
+        height: 20vh;
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+          url("https://images.unsplash.com/photo-1533139502658-0198f920d8e8?ixlib=rb-4.0.3");
+        background-size: cover;
+        background-position: center;
+        overflow: hidden;
+        margin-bottom: 60px;
+      }
+
+      .page-title {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 3rem;
+        font-weight: 300;
+        letter-spacing: 3px;
+        text-align: center;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        width: 100%;
+      }
+
+      /* Order Summary Cards */
+      .order-summary {
+        border: none;
+        border-radius: 15px;
+        padding: 25px;
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        background: white;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        height: 100%;
+      }
+
+      .order-summary:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+      }
+
+      .summary-item {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .summary-icon {
+        width: 50px;
+        height: 50px;
+        background: #fff1f0;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .summary-icon i {
+        color: #d4af37;
+        font-size: 1.5rem;
+      }
+
+      .summary-text {
+        flex: 1;
+      }
+
+      .summary-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+      }
+
+      .summary-value {
+        color: #d4af37;
+        font-size: 1.4rem;
+        font-weight: 600;
+      }
+
+      /* Table Styling */
+      .table-wrapper {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        margin-bottom: 40px;
+      }
+
+      .table {
+        margin-bottom: 0;
+      }
+
+      .table th {
+        background: #1a1a1a;
+        color: white;
+        font-weight: 500;
+        letter-spacing: 1px;
+        border: none;
+        padding: 20px;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+      }
+
+      .table td {
+        vertical-align: middle;
+        border-color: #f1f1f1;
+        padding: 20px;
+        color: #444;
+      }
+
+      .table tbody tr {
+        transition: all 0.3s ease;
+      }
+
+      .table tbody tr:hover {
+        background-color: #fff8f7;
+      }
+
+      /* Button Styling */
+      .btn-details {
+        background-color: #d4af37;
+        color: white;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 30px;
+        transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        text-decoration: none;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 500;
+      }
+
+      .btn-details:hover {
+        background-color: #1a1a1a;
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(231, 76, 60, 0.2);
+      }
+
+      .btn-continue-shopping {
+        background-color: #1a1a1a;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 30px;
+        transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.9rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 500;
+      }
+
+      .btn-continue-shopping:hover {
+        background-color: #d4af37;
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      /* Breadcrumb Styling */
+      .breadcrumb {
+        background: transparent;
+        margin: 0;
+        position: absolute;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      .breadcrumb-item a {
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        transition: color 0.3s ease;
+        font-size: 0.95rem;
+      }
+
+      .breadcrumb-item a:hover {
+        color: #d4af37;
+      }
+
+      .breadcrumb-item.active {
+        color: #d4af37;
+      }
+
+      .breadcrumb-item + .breadcrumb-item::before {
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      /* Custom Classes */
+      .order-id {
+        font-weight: 600;
+        color: #d4af37;
+      }
+
+      .customer-name {
+        font-weight: 500;
+        color: #1a1a1a;
+      }
+
+      .total-amount {
+        font-weight: 600;
+        color: #28a745;
+      }
+
+      .order-date {
+        color: #6c757d;
+      }
+
+      @media (max-width: 768px) {
+        .page-header {
+          height: 30vh;
+        }
+
+        .page-title {
+          font-size: 2rem;
+        }
+
+        .summary-value {
+          font-size: 1.2rem;
+        }
+
+        .table-wrapper {
+          overflow-x: auto;
+        }
+
+        .table th,
+        .table td {
+          padding: 15px;
+          font-size: 0.85rem;
+        }
+      }
+
+      .order-modal .modal-content {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+      }
+
+      .order-modal .modal-header {
+        background-color: #1a1a1a;
+        color: white;
+        border-bottom: none;
+        border-radius: 15px 15px 0 0;
+        padding: 20px 30px;
+      }
+
+      .order-modal .modal-title {
+        font-weight: 300;
+        letter-spacing: 1px;
+        font-size: 1.5rem;
+      }
+
+      .order-modal .modal-body {
+        padding: 30px;
+      }
+
+      .order-modal .modal-footer {
+        border-top: none;
+        padding: 20px 30px;
+      }
+
+      .order-modal .btn-close {
+        color: white;
+        opacity: 0.8;
+        filter: invert(1) grayscale(100%) brightness(200%);
+      }
+
+      .order-modal .btn-close:hover {
+        opacity: 1;
+      }
+
+      .order-detail-item {
+        display: flex;
+        align-items: center;
+        padding: 15px 0;
+        border-bottom: 1px solid #eee;
+      }
+
+      .order-detail-item:last-child {
+        border-bottom: none;
+      }
+
+      .product-img {
+        width: 80px;
+        height: 80px;
+        object-fit: contain;
+        margin-right: 20px;
+      }
+
+      .product-info {
+        flex: 1;
+      }
+
+      .product-name {
+        font-weight: 500;
+        margin-bottom: 5px;
+        font-size: 1.1rem;
+      }
+
+      .product-price {
+        color: #d4af37;
+        font-weight: 600;
+      }
+
+      .product-quantity {
+        color: #6c757d;
+        font-size: 0.9rem;
+      }
+
+      .order-summary-title {
+        font-size: 1.2rem;
+        font-weight: 500;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .order-summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+
+      .order-summary-row.total {
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid #eee;
+      }
+
+      .btn-modal-close {
+        background-color: #1a1a1a;
+        color: white;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 30px;
+        transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+
+      .btn-modal-close:hover {
+        background-color: #d4af37;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+      }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="container">
+          <div class="row align-items-center">
+            <div class="col-md-12">
+              <h1 class="page-title">Đơn Hàng Của Bạn</h1>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="container">
+        <!-- Order Summary -->
+        <div class="row mb-4">
+          <div class="col-md-3">
+            <div class="order-summary">
+              <div class="summary-item">
+                <div class="summary-icon">
+                  <i class="fas fa-shopping-bag"></i>
+                </div>
+                <div class="summary-text">
+                  <div class="summary-label">Tổng đơn hàng</div>
+                  <div class="summary-value" th:text="${totalOrders} + ' đơn'"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="order-summary">
+              <div class="summary-item">
+                <div class="summary-icon">
+                  <i class="fas fa-box"></i>
+                </div>
+                <div class="summary-text">
+                  <div class="summary-label">Đang giao</div>
+                  <div class="summary-value" id="deliveringOrders">0 đơn</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="order-summary">
+              <div class="summary-item">
+                <div class="summary-icon">
+                  <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="summary-text">
+                  <div class="summary-label">Đã hoàn thành</div>
+                  <div class="summary-value" id="completedOrders">0 đơn</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="order-summary">
+              <div class="summary-item">
+                <div class="summary-icon">
+                  <i class="fas fa-wallet"></i>
+                </div>
+                <div class="summary-text">
+                  <div class="summary-label">Tổng chi tiêu</div>
+                  <div class="summary-value" th:text="${#numbers.formatDecimal(totalSpent + totalOrders * 30000, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Table -->
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>STT</th>
+                <th>Khách Hàng</th>
+                <th>Địa Chỉ</th>
+                <th>Số Điện Thoại</th>
+                <th>Thành Tiền</th>
+                <th>Ngày Đặt Hàng</th>
+                <th>Chi Tiết</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="order, iterStat : ${orders}">
+                <td th:text="${iterStat.count}"></td>
+                <td class="customer-name" th:text="${order.fullName}"></td>
+                <td th:text="${order.address}"></td>
+                <td th:text="${order.phone}"></td>
+                <td class="total-amount" th:text="${#numbers.formatDecimal(order.totalAmount + 30000, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></td>
+                <td class="order-date" th:text="${order.orderDate != null} ? ${#dates.format(order.orderDate, 'dd/MM/yyyy')} : 'N/A'" th:data-order-date="${order.orderDateInMillis}"></td>
+                <td>
+                  <button class="btn-details" data-bs-toggle="modal" th:attr="data-bs-target='#orderDetailModal' + ${order.id}">
+                    <i class="fas fa-eye"></i> Chi tiết
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <nav aria-label="Page navigation" th:if="${totalPages > 1}">
+          <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+              <a class="page-link" th:href="@{/java5/asm/users/orders(page=${currentPage - 1}, size=${pageSize}, search=${search})}">Trước</a>
+            </li>
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, 2)}" th:if="${i < totalPages}" th:classappend="${currentPage == i} ? 'active'">
+              <a class="page-link" th:href="@{/java5/asm/users/orders(page=${i}, size=${pageSize}, search=${search})}" th:text="${i + 1}"></a>
+            </li>
+            <li class="page-item" th:if="${totalPages > 6 and currentPage > 3}">
+              <span class="page-link">...</span>
+            </li>
+            <li class="page-item" th:each="i : ${#numbers.sequence(currentPage - 1, currentPage + 1)}" th:if="${i >= 3 and i < totalPages - 3 and i >= 0}" th:classappend="${currentPage == i} ? 'active'">
+              <a class="page-link" th:href="@{/java5/asm/users/orders(page=${i}, size=${pageSize}, search=${search})}" th:text="${i + 1}"></a>
+            </li>
+            <li class="page-item" th:if="${totalPages > 6 and currentPage < totalPages - 4}">
+              <span class="page-link">...</span>
+            </li>
+            <li class="page-item" th:each="i : ${#numbers.sequence(totalPages - 3, totalPages - 1)}" th:if="${totalPages > 3 and i >= 3}" th:classappend="${currentPage == i} ? 'active'">
+              <a class="page-link" th:href="@{/java5/asm/users/orders(page=${i}, size=${pageSize}, search=${search})}" th:text="${i + 1}"></a>
+            </li>
+            <li class="page-item" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
+              <a class="page-link" th:href="@{/java5/asm/users/orders(page=${currentPage + 1}, size=${pageSize}, search=${search})}">Sau</a>
+            </li>
+          </ul>
+        </nav>
+
+        <!-- Action Buttons -->
+        <div class="d-flex justify-content-between align-items-center m-2">
+          <a href="/java5/asm/index" class="btn-continue-shopping">
+            <i class="fas fa-arrow-left"></i> Tiếp Tục Mua Sắm
+          </a>
+        </div>
+      </div>
+
+      <!-- Order Detail Modal -->
+      <div th:each="order : ${orders}" class="modal fade order-modal" th:id="'orderDetailModal' + ${order.id}" tabindex="-1" th:attr="aria-labelledby='orderDetailModalLabel' + ${order.id}" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" th:id="'orderDetailModalLabel' + ${order.id}" th:text="'Chi Tiết Đơn Hàng #' + ${order.id}"></h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" th:data-order-id="${order.id}">
+              <div class="row mb-4">
+                <div class="col-md-6">
+                  <h6>Thông Tin Khách Hàng</h6>
+                  <p><strong>Tên:</strong> <span th:text="${order.fullName}"></span></p>
+                  <p><strong>Địa chỉ:</strong> <span th:text="${order.address}"></span></p>
+                  <p><strong>Số điện thoại:</strong> <span th:text="${order.phone}"></span></p>
+                </div>
+                <div class="col-md-6">
+                  <h6>Thông Tin Đơn Hàng</h6>
+                  
+                  <p><strong>Ngày đặt:</strong> <span th:text="${order.orderDate != null} ? ${#dates.format(order.orderDate, 'dd/MM/yyyy')} : 'N/A'"></span></p>
+                  <p><strong>Trạng thái:</strong>
+                    <span th:if="${#dates.createNow().time - order.orderDateInMillis < 3 * 24 * 60 * 60 * 1000}" class="badge bg-warning">Đang giao</span>
+                    <span th:if="${#dates.createNow().time - order.orderDateInMillis >= 3 * 24 * 60 * 60 * 1000}" class="badge bg-success">Đã giao</span>
+                  </p>
+                </div>
+              </div>
+
+              <h6 class="order-summary-title">Chi Tiết Sản Phẩm</h6>
+              <div class="table-responsive">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>Ảnh</th>
+                      <th>Tên sản phẩm</th>
+                      <th>Giá</th>
+                      <th>Số lượng</th>
+                      <th>Thành tiền</th>
+                    </tr>
+                  </thead>
+                  <tbody class="order-detail-table">
+                    <!-- Dữ liệu sẽ được điền qua AJAX -->
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="mt-4">
+                <h6 class="order-summary-title">Tổng Kết</h6>
+                <div class="order-summary-row">
+                  <span>Tổng tiền hàng:</span>
+                  <span th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></span>
+                </div>
+                <div class="order-summary-row">
+                  <span>Phí vận chuyển:</span>
+                  <span th:text="${#numbers.formatDecimal(30000, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></span>
+                </div>
+                <div class="order-summary-row total">
+                  <span>Tổng thanh toán:</span>
+                  <span th:text="${#numbers.formatDecimal(order.totalAmount + 30000, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></span>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn-modal-close" data-bs-dismiss="modal">Đóng</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        // Tính số đơn hàng "Đang giao" và "Đã giao"
+        const threeDaysInMs = 3 * 24 * 60 * 60 * 1000;
+        const now = new Date().getTime();
+        let deliveringCount = 0;
+        let completedCount = 0;
+
+        $("tbody tr").each(function () {
+          const orderDate = parseInt($(this).find(".order-date").data("order-date"));
+          if (!isNaN(orderDate)) {
+            if (now - orderDate < threeDaysInMs) {
+              deliveringCount++;
+            } else {
+              completedCount++;
+            }
+          }
+        });
+
+        $("#deliveringOrders").text(deliveringCount + " đơn");
+        $("#completedOrders").text(completedCount + " đơn");
+
+        // Xử lý modal chi tiết đơn hàng
+        $(".btn-details").on("click", function () {
+          var orderId = $(this).attr("data-bs-target").replace("#orderDetailModal", "");
+          $.ajax({
+            url: "/java5/asm/order/detail/" + orderId,
+            method: "GET",
+            success: function (data) {
+              var modalBody = $("#orderDetailModal" + orderId + " .modal-body");
+              var detailTable = modalBody.find(".order-detail-table");
+              detailTable.empty();
+
+              if (data.orderDetails && data.orderDetails.length > 0) {
+                data.orderDetails.forEach(function (detail) {
+                  detailTable.append(`
+                    <tr>
+                      <td><img src="${detail.image}" alt="${detail.productName}" class="product-img" style="width: 50px; height: 50px; object-fit: contain;"></td>
+                      <td>${detail.productName}</td>
+                      <td>${new Intl.NumberFormat("vi-VN", { style: "decimal" }).format(detail.price)} VNĐ</td>
+                      <td>${detail.qty}</td>
+                      <td>${new Intl.NumberFormat("vi-VN", { style: "decimal" }).format(detail.price * detail.qty)} VNĐ</td>
+                    </tr>
+                  `);
+                });
+              } else {
+                detailTable.append("<tr><td colspan='5'>Không có chi tiết đơn hàng</td></tr>");
+              }
+            },
+            error: function (xhr, status, error) {
+              console.error("Error loading order details:", error);
+              alert("Không thể tải chi tiết đơn hàng");
+            },
+          });
+        });
+      });
+    </script>
+</body>
+</html>

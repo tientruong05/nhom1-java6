@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html th:replace="~{/layout::view(~{::title}, ~{::body}, ~{::style})}" lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Product Detail</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+      /* Giữ nguyên CSS từ file gốc */
+      body { background-color: #f8f9fa; color: #212529; font-family: "Arial", sans-serif; }
+      a { text-decoration: none !important; }
+      .product-title { font-size: 28px; font-weight: 600; color: #1a1a1a; margin-bottom: 20px; line-height: 1.3; }
+      .product-code { color: #6c757d; font-size: 14px; margin-bottom: 15px; }
+      .product-price { font-size: 32px; color: #1a1a1a; font-weight: 600; margin: 20px 0; display: flex; align-items: center; }
+      .product-price .discount-price { color: #e74c3c; font-size: 32px; font-weight: 600; }
+      .product-price .original-price { text-decoration: line-through; color: #999; font-size: 20px; font-weight: normal; margin-left: 12px; }
+      .product-price .currency { font-size: 24px; margin-left: 4px; }
+      .product-info { line-height: 2; margin-bottom: 12px; color: #4a4a4a; }
+      .product-info strong { color: #1a1a1a; width: 120px; display: inline-block; }
+      .btn-buy { background-color: #1a1a1a; color: white; padding: 12px 35px; border-radius: 6px; font-weight: 500; transition: all 0.3s ease; }
+      .btn-buy:hover { background-color: #333; color: white; transform: translateY(-2px); }
+      .btn-buy:disabled { background-color: #999; transform: none; cursor: not-allowed; }
+      .btn-cart { background-color: white; color: #1a1a1a; border: 2px solid #1a1a1a; padding: 12px 35px; border-radius: 6px; font-weight: 500; transition: all 0.3s ease; }
+      .btn-cart:hover { background-color: #f8f9fa; color: #1a1a1a; }
+      .btn-cart:disabled { background-color: #f8f9fa; color: #999; border-color: #999; cursor: not-allowed; }
+      .rating-stars { color: #1a1a1a; font-size: 18px; margin-bottom: 20px; }
+      .product-image { border-radius: 8px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); position: relative; display: block; width: 100%; height: 500px; }
+      .product-image img { width: 100%; height: 100%; object-fit: contain; display: block; }
+      .related-products { margin-top: 60px; padding-top: 40px; border-top: 1px solid #eee; }
+      .related-products h4 { font-size: 24px; font-weight: 600; color: #1a1a1a; margin-bottom: 30px; text-align: center; }
+      .related-product-item { padding: 15px; transition: all 0.3s ease; border-radius: 8px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; height: 100%; }
+      .related-product-item:hover { transform: translateY(-5px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); }
+      .related-product-item img { border-radius: 6px; margin-bottom: 12px; }
+      .related-product-title { font-weight: 600; color: #1a1a1a; font-size: 16px; text-align: center; flex-grow: 1; display: flex; align-items: center; justify-content: center; }
+      .related-product-price { font-weight: 600; color: #1a1a1a; font-size: 16px; }
+      .delivery-info { background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 30px; }
+      .social-share { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; }
+      .social-share a { color: #1a1a1a; margin-right: 15px; font-size: 18px; text-decoration: none; }
+      .social-share a:hover { color: #666; }
+      .section { width: 100%; padding: 40px 0; }
+      .discount-badge { position: absolute; top: 10px; right: 10px; background-color: #e74c3c; color: white; padding: 8px 12px; font-weight: bold; border-radius: 4px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); text-align: center; z-index: 10; }
+      .discount-badge span:first-child { font-size: 1.2rem; font-weight: 700; line-height: 1; }
+      .discount-badge span:last-child { font-size: 1rem; font-weight: 600; }
+      .product-card:hover .discount-badge { transform: scale(1.05); transition: transform 0.3s ease; }
+      .stock-status-out { color: #e74c3c; font-weight: bold; }
+      .stock-status-in { color: #2ecc71; font-weight: bold; }
+      .quantity-warning { color: #e74c3c; font-size: 13px; margin-top: 5px; display: none; }
+    </style>
+  </head>
+  <body>
+    <div class="section">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="product-image">
+              <div class="discount-badge" th:if="${product.discountPercentage != null}">
+                <span th:text="${#numbers.formatDecimal(product.discountPercentage, 0, 'POINT', 0, 'POINT') + '%'}">20%</span>
+                <span>OFF</span>
+              </div>
+              <img th:src="@{'/photos/' + ${product.image}}" th:alt="${product.name}" />
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <h1 class="product-title" th:text="${product.name}">
+              Đồng Hồ Nam SevenFriday Urban Explorer Automatic
+            </h1>
+            <p class="product-code" th:text="'Mã SP: ' + ${product.id}">
+              Mã SP: H118496
+            </p>
+
+            <p class="product-price">
+              <span th:if="${product.discountPercentage != null}">
+                <span class="discount-price" th:text="${#numbers.formatDecimal(product.discountedPrice, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"></span>
+                <span class="original-price" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"></span>
+              </span>
+              <span th:unless="${product.discountPercentage != null}">
+                <span th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}">17,500,000</span>
+              </span>
+            </p>
+
+            <div class="product-info">
+              <p>
+                <strong>Số lượng còn:</strong>
+                <span id="productQuantity" th:text="${product.qty}" th:data-qty="${product.qty}"></span>
+              </p>
+              <p>
+                <strong>Mô tả:</strong>
+                <span th:text="${product.description}"></span>
+              </p>
+              <p>
+                <strong>Trạng thái:</strong>
+                <span id="productStatus" th:class="${product.qty > 0 ? 'stock-status-in' : 'stock-status-out'}" th:text="${product.qty > 0 ? 'Còn hàng' : 'Hết hàng'}"></span>
+              </p>
+            </div>
+
+            <input type="hidden" id="productId" th:value="${product.id}" />
+
+            <div class="d-flex gap-3 mt-4">
+              <div class="input-group mb-3" style="max-width: 200px">
+                <button class="btn btn-outline-secondary" type="button" onclick="decrementQuantity()" th:disabled="${product.qty <= 0}" id="decrementBtn">-</button>
+                <input type="number" class="form-control text-center" id="quantity" value="1" min="1" th:max="${product.qty}" th:disabled="${product.qty <= 0}" onchange="validateQuantity()" oninput="validateQuantity()" />
+                <button class="btn btn-outline-secondary" type="button" onclick="incrementQuantity()" th:disabled="${product.qty <= 0}" id="incrementBtn">+</button>
+              </div>
+              <div class="quantity-warning" id="quantityWarning">
+                Số lượng không được vượt quá số lượng sản phẩm hiện có!
+              </div>
+            </div>
+            <div class="d-flex gap-3">
+              <button class="btn btn-buy" onclick="buyNow()" th:disabled="${product.qty <= 0}" id="buyBtn">Mua ngay</button>
+              <button class="btn btn-cart" onclick="addToCart()" th:disabled="${product.qty <= 0}" id="cartBtn">Thêm vào giỏ</button>
+            </div>
+
+            <div class="delivery-info">
+              <p class="mb-2"><strong>Giao hàng:</strong> Freeship Hà Nội & HCM</p>
+              <p class="mb-0"><strong>Hotline:</strong> 093.934.8888</p>
+            </div>
+
+            <div class="social-share">
+              <span class="text-muted">Chia sẻ:</span>
+              <a href="#"><i class="bi bi-facebook"></i></a>
+              <a href="#"><i class="bi bi-twitter"></i></a>
+              <a href="#"><i class="bi bi-pinterest"></i></a>
+            </div>
+          </div>
+        </div>
+
+        <div class="related-products">
+          <h4>Đề xuất sản phẩm lựa chọn khác</h4>
+          <div class="row">
+            <div class="col-md-2" th:each="related : ${relatedProducts}">
+              <div class="related-product-item">
+                <a th:href="@{'/java5/asm/products/detail/' + ${related.id}}">
+                  <img th:src="@{'/photos/' + ${related.image}}" th:alt="${related.name}" class="img-fluid" />
+                  <p class="related-product-title" th:text="${related.name}">
+                    Đồng Hồ Nam SevenFriday Urban Explorer Automatic
+                  </p>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+      <script>
+        document.addEventListener("DOMContentLoaded", function () {
+          checkProductAvailability();
+        });
+
+        function checkProductAvailability() {
+          const productQty = parseInt(document.getElementById("productQuantity").getAttribute("data-qty"));
+          const buyBtn = document.getElementById("buyBtn");
+          const cartBtn = document.getElementById("cartBtn");
+          const statusElement = document.getElementById("productStatus");
+          const quantityInput = document.getElementById("quantity");
+          const decrementBtn = document.getElementById("decrementBtn");
+          const incrementBtn = document.getElementById("incrementBtn");
+
+          if (productQty <= 0) {
+            statusElement.textContent = "Hết hàng";
+            statusElement.className = "stock-status-out";
+            buyBtn.disabled = true;
+            cartBtn.disabled = true;
+            quantityInput.disabled = true;
+            decrementBtn.disabled = true;
+            incrementBtn.disabled = true;
+          } else {
+            quantityInput.max = productQty;
+            if (parseInt(quantityInput.value) > productQty) {
+              quantityInput.value = productQty;
+            }
+            statusElement.textContent = "Còn hàng";
+            statusElement.className = "stock-status-in";
+            buyBtn.disabled = false;
+            cartBtn.disabled = false;
+            quantityInput.disabled = false;
+            decrementBtn.disabled = false;
+            incrementBtn.disabled = false;
+          }
+        }
+
+        function validateQuantity() {
+          const quantityInput = document.getElementById("quantity");
+          const productQty = parseInt(document.getElementById("productQuantity").getAttribute("data-qty"));
+          const warningElement = document.getElementById("quantityWarning");
+
+          let currentQty = parseInt(quantityInput.value);
+
+          if (isNaN(currentQty) || currentQty < 1) {
+            quantityInput.value = 1;
+            currentQty = 1;
+          }
+
+          if (currentQty > productQty) {
+            quantityInput.value = productQty;
+            warningElement.style.display = "block";
+            setTimeout(() => {
+              warningElement.style.display = "none";
+            }, 3000);
+          } else {
+            warningElement.style.display = "none";
+          }
+        }
+
+        function incrementQuantity() {
+          let qty = document.getElementById("quantity");
+          const productQty = parseInt(document.getElementById("productQuantity").getAttribute("data-qty"));
+          const warningElement = document.getElementById("quantityWarning");
+
+          let currentQty = parseInt(qty.value);
+
+          if (currentQty < productQty) {
+            qty.value = currentQty + 1;
+          } else {
+            warningElement.style.display = "block";
+            setTimeout(() => {
+              warningElement.style.display = "none";
+            }, 3000);
+          }
+        }
+
+        function decrementQuantity() {
+          let qty = document.getElementById("quantity");
+          const currentQty = parseInt(qty.value);
+
+          if (currentQty > 1) {
+            qty.value = currentQty - 1;
+          }
+          document.getElementById("quantityWarning").style.display = "none";
+        }
+
+        function addToCart() {
+          let quantityInput = document.getElementById("quantity");
+          let productId = document.getElementById("productId").value;
+          const productQty = parseInt(document.getElementById("productQuantity").getAttribute("data-qty"));
+
+          if (productQty <= 0) {
+            alert("Sản phẩm hiện đã hết hàng!");
+            return;
+          }
+
+          let quantity = parseInt(quantityInput.value);
+
+          if (isNaN(quantity) || quantity < 1) {
+            quantity = 1;
+            quantityInput.value = 1;
+          }
+
+          if (quantity > productQty) {
+            quantity = productQty;
+            quantityInput.value = productQty;
+            alert(`Số lượng đặt hàng đã được điều chỉnh thành ${productQty} theo số lượng có sẵn.`);
+          }
+
+          fetch(`/java5/asm/cart/add/${productId}`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: `quantity=${quantity}`,
+          })
+            .then((response) => response.text())
+            .then((result) => {
+              if (result === "success") {
+                alert("Thêm vào giỏ hàng thành công!");
+                updateCartCount();
+              } else {
+                alert("Vui lòng đăng nhập để thêm vào giỏ hàng!");
+                window.location.href = "/java5/asm/login";
+              }
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              alert("Có lỗi xảy ra khi thêm vào giỏ hàng!");
+            });
+        }
+
+        function buyNow() {
+          const productQty = parseInt(document.getElementById("productQuantity").getAttribute("data-qty"));
+
+          if (productQty <= 0) {
+            alert("Sản phẩm hiện đã hết hàng!");
+            return;
+          }
+
+          validateQuantity();
+          addToCart();
+          setTimeout(() => {
+            window.location.href = "/java5/asm/cart";
+          }, 1000);
+        }
+
+        function updateCartCount() {
+          fetch("/java5/asm/cart/count")
+            .then((response) => response.text())
+            .then((count) => {
+              document.getElementById("cart-count").textContent = count;
+            });
+        }
+      </script>
+    </div>
+  </body>
+</html>

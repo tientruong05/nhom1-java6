@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kết quả tìm kiếm - Watch Store</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Roboto", "Arial", sans-serif;
+        color: #1a1a1a;
+        background-color: #f5f5f5;
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+      }
+      .product-card {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+      .product-card .card-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+      .product-title {
+        height: 60px;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        margin-top: 15px;
+      }
+      .product-card .btn-shop {
+        margin-top: auto;
+      }
+      .product-card .text-center {
+        height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .product-card img {
+        max-height: 180px;
+        width: auto;
+      }
+      .price,
+      .price-custom {
+        margin: 10px 0;
+        height: 30px;
+      }
+      .product-card {
+        border: none;
+        border-radius: 0;
+        padding: 20px;
+        transition: all 0.4s ease;
+        background: white;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      }
+      .product-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+      }
+      .product-card img {
+        width: 100%;
+        height: auto;
+        object-fit: contain;
+        margin-bottom: 15px;
+        transition: transform 0.3s ease;
+      }
+      .product-card:hover img {
+        transform: scale(1.05);
+      }
+      .product-title {
+        font-size: 1.3rem;
+        color: #0b0b0b;
+        margin: 15px 0;
+        font-weight: 400;
+        letter-spacing: 0.5px;
+      }
+      .price {
+        color: #e74c3c;
+        font-size: 1.4rem;
+        font-weight: 500;
+        margin: 15px 0;
+      }
+      .btn-shop {
+        background-color: #e74c3c;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 25px;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.9rem;
+        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+      }
+      .btn-shop:hover {
+        background-color: #0b0b0b;
+        color: #e74c3c;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(212, 175, 55, 0.3);
+      }
+      .collection-section {
+        background-color: white;
+        padding: 80px 0;
+      }
+      .section-title {
+        text-align: center;
+        margin-bottom: 50px;
+        color: #0b0b0b;
+        font-size: 2.5rem;
+        font-weight: 300;
+        letter-spacing: 2px;
+        position: relative;
+        padding-bottom: 15px;
+      }
+      .section-title::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 2px;
+        background-color: #e74c3c;
+      }
+      .price-custom {
+        text-decoration: line-through;
+      }
+      .product {
+        text-decoration: none;
+        color: black;
+      }
+      .product:hover {
+        color: #e74c3c;
+        text-decoration: underline;
+      }
+      .discount-badge {
+        position: absolute;
+        top: 0;
+        right: 0;
+        background-color: #e74c3c;
+        color: white;
+        padding: 8px 10px;
+        font-weight: bold;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      }
+      .discount-badge span:first-child {
+        font-size: 1.2rem;
+        font-weight: 700;
+        line-height: 1;
+      }
+      .discount-badge span:last-child {
+        font-size: 1rem;
+        font-weight: 600;
+      }
+      .product-card:hover .discount-badge {
+        transform: scale(1.05);
+        transition: transform 0.3s ease;
+      }
+      .flash-sale-section {
+        background-color: #ff4444;
+        color: white;
+        padding: 20px 0;
+        text-align: center;
+        margin-bottom: 30px;
+      }
+      .flash-sale-section h2 {
+        font-size: 2rem;
+        font-weight: 500;
+        margin-bottom: 10px;
+      }
+      .flash-sale-section p {
+        font-size: 1.2rem;
+      }
+      .pagination {
+        margin-top: 20px;
+      }
+      .page-link {
+        background-color: #fff;
+        color: #e74c3c;
+        border: 1px solid #e74c3c;
+      }
+      .page-link:hover {
+        background-color: #e74c3c;
+        color: #fff;
+      }
+      .page-item.active .page-link {
+        background-color: #e74c3c;
+        border-color: #e74c3c;
+        color: #fff;
+      }
+      .page-item.disabled .page-link {
+        background-color: #fff;
+        color: #ccc;
+      }
+    </style>
+    <link rel="stylesheet" th:href="@{/css/header.css}" />
+    <link rel="stylesheet" th:href="@{/css/footer.css}" />
+  </head>
+  <body>
+    <div th:replace="fragments/header :: header"></div>
+
+    <!-- Flash Sale Section -->
+    <section th:if="${isFlashSaleActive}" class="flash-sale-section">
+      <div class="container">
+        <h2>Flash Sale Đang Diễn Ra!</h2>
+        <p>Thời gian còn lại: <span id="countdown"></span></p>
+      </div>
+    </section>
+
+    <!-- Search Results -->
+    <section class="collection-section">
+      <div class="container">
+        <h2 class="section-title">Kết quả tìm kiếm cho: <span th:text="${search}"></span></h2>
+        <div class="row g-4">
+          <th:block th:each="product : ${products}">
+            <div class="col-md-3">
+              <div class="product-card position-relative">
+                <div
+                  class="discount-badge"
+                  th:if="${product.discount != null and product.discount > 0}"
+                >
+                  <span
+                    th:text="${#numbers.formatInteger(product.discount, 0) + '%'}"
+                    >48%</span
+                  >
+                  <span>OFF</span>
+                </div>
+                <div class="text-center">
+                  <img
+                    th:src="@{'/photos/' + ${product.image}}"
+                    class="card-img-top w-50 mx-auto d-block"
+                  />
+                </div>
+                <div class="card-body text-center">
+                  <h3 class="product-title">
+                    <input
+                      type="hidden"
+                      id="productId"
+                      th:value="${product.id}"
+                    />
+                    <a
+                      class="product"
+                      th:href="@{'/java5/asm/products/detail/' + ${product.id}}"
+                      th:text="${product.name}"
+                      >Watch Name</a
+                    >
+                  </h3>
+                  <p
+                    class="price"
+                    th:text="${#numbers.formatDecimal(product.discountedPrice, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"
+                  >
+                    $999
+                  </p>
+                  <p
+                    class="price-custom"
+                    th:if="${product.discount != null and product.discount > 0}"
+                    th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"
+                  >
+                    $999
+                  </p>
+                  <button
+                    class="btn btn-shop add-to-cart"
+                    th:data-id="${product.id}"
+                    onclick="addToCart(this)"
+                  >
+                    Thêm vào giỏ
+                  </button>
+                </div>
+              </div>
+            </div>
+          </th:block>
+        </div>
+
+        <!-- Phân trang -->
+        <nav aria-label="Page navigation" th:if="${totalPages > 1}">
+          <ul class="pagination justify-content-center">
+            <!-- Nút Previous -->
+            <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+              <a class="page-link" th:href="@{/java5/asm/search(q=${search}, page=${currentPage - 1}, size=${pageSize})}">Trước</a>
+            </li>
+
+            <!-- 3 trang đầu -->
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, 2)}" th:if="${i < totalPages}" th:classappend="${currentPage == i} ? 'active'">
+              <a class="page-link" th:href="@{/java5/asm/search(q=${search}, page=${i}, size=${pageSize})}" th:text="${i + 1}"></a>
+            </li>
+
+            <!-- Dấu "..." nếu cần (trước các trang xung quanh trang hiện tại) -->
+            <li class="page-item" th:if="${totalPages > 6 and currentPage > 3}">
+              <span class="page-link">...</span>
+            </li>
+
+            <!-- Các trang xung quanh trang hiện tại -->
+            <li class="page-item" th:each="i : ${#numbers.sequence(currentPage - 1, currentPage + 1)}" th:if="${i >= 3 and i < totalPages - 3 and i >= 0}" th:classappend="${currentPage == i} ? 'active'">
+              <a class="page-link" th:href="@{/java5/asm/search(q=${search}, page=${i}, size=${pageSize})}" th:text="${i + 1}"></a>
+            </li>
+
+            <!-- Dấu "..." nếu cần (sau các trang xung quanh trang hiện tại) -->
+            <li class="page-item" th:if="${totalPages > 6 and currentPage < totalPages - 4}">
+              <span class="page-link">...</span>
+            </li>
+
+            <!-- 3 trang cuối -->
+            <li class="page-item" th:each="i : ${#numbers.sequence(totalPages - 3, totalPages - 1)}" th:if="${totalPages > 3 and i >= 3}" th:classappend="${currentPage == i} ? 'active'">
+              <a class="page-link" th:href="@{/java5/asm/search(q=${search}, page=${i}, size=${pageSize})}" th:text="${i + 1}"></a>
+            </li>
+
+            <!-- Nút Next -->
+            <li class="page-item" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
+              <a class="page-link" th:href="@{/java5/asm/search(q=${search}, page=${currentPage + 1}, size=${pageSize})}">Sau</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </section>
+
+    <div th:replace="fragments/footer :: footer"></div>
+
+    <script>
+      function addToCart(button) {
+        let productId = button.getAttribute("data-id");
+        let quantity = 1; // Mặc định số lượng là 1 khi thêm từ trang tìm kiếm
+
+        fetch(`/java5/asm/cart/add/${productId}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: `quantity=${quantity}`,
+        })
+          .then((response) => response.text())
+          .then((result) => {
+            if (result === "success") {
+              alert("Thêm vào giỏ hàng thành công!");
+              updateCartCount();
+            } else if (result === "redirect:/java5/asm/login") {
+              alert("Vui lòng đăng nhập để thêm vào giỏ hàng!");
+              window.location.href = "/java5/asm/login";
+            } else if (result.startsWith("error:")) {
+              alert(result.substring(6)); // Hiển thị thông báo lỗi từ backend
+            } else {
+              alert("Có lỗi không xác định xảy ra!");
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("Có lỗi xảy ra khi thêm vào giỏ hàng!");
+          });
+      }
+
+      function updateCartCount() {
+        fetch("/java5/asm/cart/count")
+          .then((response) => response.text())
+          .then((count) => {
+            const cartCountElement = document.getElementById("cart-count");
+            if (cartCountElement) {
+              cartCountElement.textContent = count;
+            }
+          });
+      }
+
+      // Countdown timer cho Flash Sale
+      document.addEventListener("DOMContentLoaded", function () {
+        if (document.getElementById("countdown")) {
+          function startCountdown() {
+            const endTime = new Date("[[${flashSaleEndTime}]]".replace("T", " ")).getTime();
+            const countdownElement = document.getElementById("countdown");
+
+            const interval = setInterval(() => {
+              const now = new Date().getTime();
+              const distance = endTime - now;
+
+              if (distance < 0) {
+                clearInterval(interval);
+                countdownElement.innerHTML = "Flash Sale đã kết thúc!";
+                return;
+              }
+
+              const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+              const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+              const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+              const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+              countdownElement.innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s";
+            }, 1000);
+          }
+
+          startCountdown();
+        }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

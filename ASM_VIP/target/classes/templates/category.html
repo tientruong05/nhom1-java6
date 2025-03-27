@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html th:replace="~{/layout::view(~{::title}, ~{::body}, ~{::style})}" lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="${categoryName + ' - Watch Store'}">Category - Watch Store</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" th:href="@{'/css/header.css'}" />
+    <link rel="stylesheet" th:href="@{'/css/footer.css'}" />
+    <style>
+      /* Giữ nguyên CSS từ file gốc */
+      body { font-family: "Segoe UI", sans-serif; background-color: #ecf0f1; color: #34495e; }
+      .search-filter-container { background-color: white; padding: 20px; border-radius: 10px; margin: 20px 0; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); }
+      .form-control, .form-select { border: 1px solid #ddd; color: #34495e; background-color: #f9f9f9; }
+      .form-control:focus, .form-select:focus { border-color: #3498db; box-shadow: 0 0 5px rgba(52, 152, 219, 0.3); background-color: white; }
+      .btn-filter { background-color: black; color: white; border: none; transition: all 0.3s ease; }
+      .btn-filter:hover { background-color: black; color: white; transform: translateY(-2px); }
+      .product-card { background: white; border-radius: 10px; overflow: hidden; transition: all 0.3s ease; height: 100%; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); }
+      .product-card:hover { transform: translateY(-10px); box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15); }
+      .product-img-container { position: relative; overflow: hidden; padding-top: 100%; background-color: #f5f6f7; }
+      .product-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+      .product-card:hover .product-img { transform: scale(1.1); }
+      .discount-badge { position: absolute; top: 0; right: 0; background-color: #e74c3c; color: white; padding: 8px 10px; font-weight: bold; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); }
+      .discount-badge span:first-child { font-size: 1.2rem; font-weight: 700; line-height: 1; }
+      .discount-badge span:last-child { font-size: 1rem; font-weight: 600; }
+      .product-card:hover .discount-badge { transform: scale(1.05); transition: transform 0.3s ease; }
+      .product-info { padding: 15px; text-align: center; }
+      .product-title { color: #34495e; font-size: 1.1rem; margin-bottom: 10px; height: 2.4em; overflow: hidden; }
+      .product-price { color: #e74c3c; font-weight: bold; font-size: 1.2rem; margin-bottom: 0; }
+      .product-price .original-price { text-decoration: line-through; color: #999; font-size: 0.9rem; font-weight: normal; margin-left: 8px; }
+      .product-price .discount-price { color: #e74c3c; font-weight: bold; }
+      .quick-view-btn { position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%); background-color: white; color: black; border: none; border-radius: 5px; padding: 8px 15px; transition: all 0.3s ease; opacity: 0; }
+      .quick-view-btn:hover { background-color: #e74c3c !important; color: white !important; }
+      .product-card:hover .quick-view-btn { bottom: 20px; opacity: 1; }
+      .section-title { color: #2c3e50; margin-bottom: 30px; font-weight: 700; position: relative; padding-bottom: 10px; text-align: center; }
+      .section-title::after { content: ""; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 60px; height: 3px; background-color: #3498db; }
+      .product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; padding: 0 15px; }
+      @media (max-width: 1200px) { .product-grid { grid-template-columns: repeat(3, 1fr); } }
+      @media (max-width: 768px) { .product-grid { grid-template-columns: repeat(2, 1fr); } }
+      @media (max-width: 576px) { .product-grid { grid-template-columns: 1fr; } }
+      .pagination { justify-content: center; margin-top: 40px; }
+      .page-link { color: #e74c3c; border: none; padding: 10px 15px; margin: 0 5px; transition: all 0.3s ease; }
+      .page-link:hover { background-color: #e74c3c; color: white; }
+      .page-item.active .page-link { background-color: #e74c3c; color: white; }
+      .page-item.disabled .page-link { color: #ccc; }
+      .result-count { text-align: center; color: #34495e; margin-bottom: 20px; }
+      .search-filter-container .row { align-items: center; }
+      .search-filter-container .col-lg-4 { flex-grow: 1; min-width: 0; }
+      .search-filter-container .form-control#searchInput { width: 100%; }
+      .search-filter-container .col-lg-3:nth-child(2) { flex: 0 0 auto; width: 25%; }
+      .search-filter-container .col-lg-3:nth-child(3) { flex: 0 0 auto; width: 25%; }
+      .search-filter-container .col-lg-2 { flex: 0 0 auto; width: 15%; }
+      @media (max-width: 992px) {
+        .search-filter-container .col-lg-4 { width: 100%; margin-bottom: 15px; }
+        .search-filter-container .col-lg-3:nth-child(2), .search-filter-container .col-lg-3:nth-child(3) { width: 50%; }
+        .search-filter-container .col-lg-2 { width: 100%; margin-top: 15px; }
+      }
+      @media (max-width: 576px) {
+        .search-filter-container .col-lg-3:nth-child(2), .search-filter-container .col-lg-3:nth-child(3) { width: 100%; margin-bottom: 15px; }
+      }
+      .toast-container { position: fixed; top: 20px; right: 20px; z-index: 1055; }
+      .toast { border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); min-width: 300px; background-color: #fff; border: none; }
+      .toast-header { background-color: transparent; border-bottom: none; padding: 10px 15px; }
+      .toast-header .me-auto { font-weight: 500; color: #34495e; }
+      .toast-body { padding: 10px 15px; color: #34495e; font-size: 0.9rem; }
+      .toast-success .toast-header { color: #28a745; }
+      .toast-success .toast-header i { margin-right: 8px; }
+      .toast-error .toast-header { color: #dc3545; }
+      .toast-error .toast-header i { margin-right: 8px; }
+      .toast .btn-close { filter: invert(0.5); }
+      @media (max-width: 576px) {
+        .toast-container { top: 10px; right: 10px; left: 10px; width: auto; }
+        .toast { min-width: 100%; }
+      }
+      .flash-sale-section { background-color: #ff4444; color: white; padding: 20px 0; text-align: center; margin-bottom: 30px; }
+      .flash-sale-section h2 { font-size: 2rem; font-weight: 500; margin-bottom: 10px; }
+      .flash-sale-section p { font-size: 1.2rem; }
+    </style>
+  </head>
+  <body>
+    <!-- Toast Container -->
+    <div class="toast-container">
+      <div th:if="${success != null}" class="toast toast-success" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="5000">
+        <div class="toast-header">
+          <i class="fas fa-check-circle"></i>
+          <strong class="me-auto">Thành công</strong>
+          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" th:text="${success}"></div>
+      </div>
+      <div th:if="${error != null}" class="toast toast-error" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="5000">
+        <div class="toast-header">
+          <i class="fas fa-times-circle"></i>
+          <strong class="me-auto">Lỗi</strong>
+          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" th:text="${error}"></div>
+      </div>
+    </div>
+    <section th:if="${isFlashSaleActive}" class="flash-sale-section">
+      <div class="container">
+        <h2>Flash Sale Đang Diễn Ra!</h2>
+        <p>Thời gian còn lại: <span id="countdown"></span></p>
+      </div>
+    </section>
+    <div class="section">
+      <div class="container py-4">
+        <!-- Search & Filter Section -->
+        <div class="search-filter-container">
+          <form th:action="@{/java5/asm/list-product}" method="get" class="row g-3">
+            <input type="hidden" th:name="categoryId" th:value="${categoryId}" />
+            <input type="hidden" th:name="subCategoryId" th:value="${subCategoryId}" />
+            <input type="hidden" th:name="brandName" th:value="${brandName}" />
+            <input type="hidden" th:name="size" th:value="${pageSize}" />
+            <div class="col-lg-4">
+              <input type="text" class="form-control" id="searchInput" name="search" th:value="${search}" placeholder="Tìm kiếm sản phẩm cho thể loại..." />
+            </div>
+            <div class="col-lg-3" th:if="${showGenderFilter}">
+              <select class="form-select" id="genderFilter" name="gender">
+                <option value="" th:selected="${gender == null}">Chọn giới tính</option>
+                <option value="male" th:selected="${gender == 'male'}">Nam</option>
+                <option value="female" th:selected="${gender == 'female'}">Nữ</option>
+              </select>
+            </div>
+            <div class="col-lg-3">
+              <select class="form-select" id="priceFilter" name="priceRange">
+                <option value="" th:selected="${priceRange == null}">Chọn mức giá</option>
+                <option value="1-3" th:selected="${priceRange == '1-3'}">1-3 triệu</option>
+                <option value="3-5" th:selected="${priceRange == '3-5'}">3-5 triệu</option>
+                <option value="5+" th:selected="${priceRange == '5+'}">Trên 5 triệu</option>
+              </select>
+            </div>
+            <div class="col-lg-2">
+              <button type="submit" class="btn btn-filter w-100">
+                <i class="fas fa-filter me-2"></i>Lọc
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <h2 class="section-title" th:text="${categoryName}">Category Name</h2>
+        <p class="result-count" th:text="'Tìm thấy ' + ${totalItems} + ' sản phẩm'">Tìm thấy X sản phẩm</p>
+
+        <div class="container">
+          <div class="product-grid">
+            <div th:each="product : ${products}">
+              <div class="product-card">
+                <div class="product-img-container">
+                  <div class="discount-badge" th:if="${product.discountPercentage != null}">
+                    <span th:text="${#numbers.formatDecimal(product.discountPercentage, 0, 'POINT', 0, 'POINT') + '%'}">20%</span>
+                    <span>OFF</span>
+                  </div>
+                  <img th:src="@{'/photos/' + ${product.image}}" class="product-img" alt="Watch" />
+                  <a class="quick-view-btn btn" th:href="@{'/java5/asm/products/detail/' + ${product.id}}">Xem nhanh</a>
+                </div>
+                <div class="product-info">
+                  <h3 class="product-title" th:text="${product.name}">Watch Name</h3>
+                  <p class="product-price">
+                    <span th:if="${product.discountPercentage != null}">
+                      <span class="discount-price" th:text="${#numbers.formatDecimal(product.discountedPrice, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"></span>
+                      <span class="original-price" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"></span>
+                    </span>
+                    <span th:unless="${product.discountPercentage != null}" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}">Price</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Phân trang -->
+          <nav aria-label="Page navigation" th:if="${totalPages > 1}">
+            <ul class="pagination">
+              <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                <a class="page-link" th:href="@{/java5/asm/list-product(categoryId=${categoryId}, subCategoryId=${subCategoryId}, brandName=${brandName}, search=${search}, gender=${gender}, priceRange=${priceRange}, page=${currentPage - 1}, size=${pageSize})}" aria-label="Previous">
+                  <span aria-hidden="true">«</span>
+                </a>
+              </li>
+              <li class="page-item" th:each="i : ${#numbers.sequence(0, 2)}" th:if="${i < totalPages}" th:classappend="${currentPage == i} ? 'active'">
+                <a class="page-link" th:href="@{/java5/asm/list-product(categoryId=${categoryId}, subCategoryId=${subCategoryId}, brandName=${brandName}, search=${search}, gender=${gender}, priceRange=${priceRange}, page=${i}, size=${pageSize})}" th:text="${i + 1}"></a>
+              </li>
+              <li class="page-item" th:if="${totalPages > 6 and currentPage > 3}">
+                <span class="page-link">...</span>
+              </li>
+              <li class="page-item" th:each="i : ${#numbers.sequence(currentPage - 1, currentPage + 1)}" th:if="${i >= 3 and i < totalPages - 3 and i >= 0}" th:classappend="${currentPage == i} ? 'active'">
+                <a class="page-link" th:href="@{/java5/asm/list-product(categoryId=${categoryId}, subCategoryId=${subCategoryId}, brandName=${brandName}, search=${search}, gender=${gender}, priceRange=${priceRange}, page=${i}, size=${pageSize})}" th:text="${i + 1}"></a>
+              </li>
+              <li class="page-item" th:if="${totalPages > 6 and currentPage < totalPages - 4}">
+                <span class="page-link">...</span>
+              </li>
+              <li class="page-item" th:each="i : ${#numbers.sequence(totalPages - 3, totalPages - 1)}" th:if="${totalPages > 3 and i >= 3}" th:classappend="${currentPage == i} ? 'active'">
+                <a class="page-link" th:href="@{/java5/asm/list-product(categoryId=${categoryId}, subCategoryId=${subCategoryId}, brandName=${brandName}, search=${search}, gender=${gender}, priceRange=${priceRange}, page=${i}, size=${pageSize})}" th:text="${i + 1}"></a>
+              </li>
+              <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                <a class="page-link" th:href="@{/java5/asm/list-product(categoryId=${categoryId}, subCategoryId=${subCategoryId}, brandName=${brandName}, search=${search}, gender=${gender}, priceRange=${priceRange}, page=${currentPage + 1}, size=${pageSize})}" aria-label="Next">
+                  <span aria-hidden="true">»</span>
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const toasts = document.querySelectorAll(".toast");
+        toasts.forEach((toast) => {
+          const bsToast = new bootstrap.Toast(toast);
+          bsToast.show();
+        });
+
+        if (document.getElementById("countdown")) {
+          function startCountdown() {
+            const endTime = new Date("[[${flashSaleEndTime}]]".replace("T", " ")).getTime();
+            const countdownElement = document.getElementById("countdown");
+
+            const interval = setInterval(() => {
+              const now = new Date().getTime();
+              const distance = endTime - now;
+
+              if (distance < 0) {
+                clearInterval(interval);
+                countdownElement.innerHTML = "Flash Sale đã kết thúc!";
+                return;
+              }
+
+              const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+              const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+              const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+              const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+              countdownElement.innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s";
+            }, 1000);
+          }
+          startCountdown();
+        }
+      });
+    </script>
+  </body>
+</html>

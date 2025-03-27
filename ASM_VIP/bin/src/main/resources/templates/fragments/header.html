@@ -1,0 +1,304 @@
+<header class="header border-bottom py-3">
+  <div class="container">
+    <div class="row align-items-center">
+      <!-- Logo -->
+      <div class="col-lg-1 col-md-1 col-4 text-center logo-container">
+        <a href="/java5/asm/index" class="logo-link">
+          <svg class="logo" width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="40" cy="40" r="30" stroke="#d4af37" stroke-width="2" fill="none" />
+          <circle cx="40" cy="40" r="3" fill="#d4af37" />
+          <line x1="40" y1="40" x2="40" y2="20" stroke="#d4af37" stroke-width="2" />
+          <line x1="40" y1="40" x2="55" y2="45" stroke="#d4af37" stroke-width="2" />
+        </svg>
+        <div class="logo-text">TimeLux Watch</div>
+        </a>
+      </div>
+
+      <!-- Menu Chính -->
+      <div class="col-lg-9 col-md-9 d-none d-md-block">
+        <nav class="text-center">
+          <ul class="nav justify-content-center">
+            <li class="nav-item">
+              <a href="/java5/asm/index" class="nav-link text-uppercase"
+                >Trang Chủ</a
+              >
+            </li>
+
+            <!-- Hiển thị "Đồng Hồ" cho tất cả -->
+			<!-- Hiển thị "Đồng Hồ" cho tất cả -->
+			            <li class="nav-item dropdown watch-menu">
+			              <a href="/java5/asm/list-product" class="nav-link text-uppercase"
+			                >Đồng hồ</a
+			              >
+			              <ul class="dropdown-menu">
+							<li>
+										                  <a
+										                    class="dropdown-item"
+										                    href="/java5/asm/list-product?categoryId=1"
+										                    >Nam</a
+										                  >
+										                </li>
+										                <li>
+										                  <a
+										                    class="dropdown-item"
+										                    href="/java5/asm/list-product?categoryId=2"
+										                    >Nữ</a
+										                  >
+										                </li>
+			                <li th:each="brand : ${watchBrands}">
+			                  <a
+			                    class="dropdown-item"
+			                    th:href="@{/java5/asm/list-product(brandName=${brand.subCategoriesName})}"
+			                    th:text="${brand.subCategoriesName}"
+			                  ></a>
+			                </li>
+			                
+			              </ul>
+			            </li>
+
+            <!-- Hàng giảm giá -->
+            <li class="nav-item">
+              <a
+                href="/java5/asm/list-product?discount=true"
+                class="nav-link text-uppercase"
+                >Hàng giảm giá</a
+              >
+            </li>
+
+            <!-- 🛑 Chỉ hiển thị menu "Quản lý" nếu user là Admin -->
+            <li
+              class="nav-item dropdown"
+              th:if="${session.user != null and session.user.role}"
+            >
+              <a class="nav-link text-uppercase" href="#">Quản lý</a>
+              <ul class="dropdown-menu">
+                <li>
+                  <a class="dropdown-item" href="/java5/asm/crud/categories"
+                    >QL thể loại</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="/java5/asm/crud/products"
+                    >QL mặt hàng</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="/java5/asm/crud/users"
+                    >QL người dùng</a
+                  >
+                </li>
+              </ul>
+            </li>
+
+            <!-- 🛑 Chỉ hiển thị menu "Người dùng" nếu đã đăng nhập -->
+            <li class="nav-item dropdown" th:if="${session.user != null}">
+              <a class="nav-link text-uppercase" href="#">Người dùng</a>
+              <ul class="dropdown-menu">
+                <li>
+                  <a class="dropdown-item" href="/java5/asm/change_pw"
+                    >Đổi mật khẩu</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="/java5/asm/profile"
+                    >Thông tin tài khoản</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="/java5/asm/users/orders"
+                    >Đơn hàng của tôi</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="/java5/asm/users/shopping-history"
+                    >Lịch sử mua sắm</a
+                  >
+                </li>
+                
+              </ul>
+            </li>
+
+            <!-- 🛑 Chỉ Admin mới thấy "Thống kê" -->
+            <li
+              class="nav-item dropdown"
+              th:if="${session.user != null and session.user.role}"
+            >
+              <a class="nav-link text-uppercase" href="#">Thống kê</a>
+              <ul class="dropdown-menu">
+                <li>
+                  <a class="dropdown-item" href="/java5/asm/statistics/business"
+                    >Doanh thu</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="/java5/asm/statistics/customers"
+                    >Khách hàng</a
+                  >
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </nav>
+      </div>
+
+      <!-- 🛑 Hiển thị biểu tượng đăng nhập/đăng xuất và thanh tìm kiếm -->
+      <div
+        class="col-lg-2 col-md-2 col-8 text-end d-flex align-items-center justify-content-end"
+      >
+        <!-- Thanh tìm kiếm mới -->
+        <div class="search-container">
+          <button class="search-btn header-icon" id="searchBtn">
+            <i class="bi bi-search"></i>
+          </button>
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Tìm sản phẩm..."
+            id="searchInput"
+            name="searchAll"
+          />
+
+          <!-- Search Suggestions 
+          <div class="search-suggestions">
+            <div class="suggestion-item">
+              <img src="/api/placeholder/40/40" alt="Product" />
+              <div class="suggestion-info">
+                <p class="suggestion-name">Versace Bright Crystal</p>
+                <p class="suggestion-price">2.500.000 đ</p>
+              </div>
+            </div>
+            <div class="suggestion-item">
+              <img src="/api/placeholder/40/40" alt="Product" />
+              <div class="suggestion-info">
+                <p class="suggestion-name">Versace Eros</p>
+                <p class="suggestion-price">3.100.000 đ</p>
+              </div>
+            </div>
+            <div class="suggestion-item">
+              <img src="/api/placeholder/40/40" alt="Product" />
+              <div class="suggestion-info">
+                <p class="suggestion-name">Versace Pour Homme</p>
+                <p class="suggestion-price">2.800.000 đ</p>
+              </div>
+            </div>
+          </div>-->
+        </div>
+
+        <!-- Giữ các icon khác -->
+        <a
+          href="/java5/asm/login"
+          class="header-icon"
+          th:if="${session.user == null}"
+        >
+          <i class="bi bi-person"></i>
+        </a>
+        <a
+          href="/java5/asm/logout"
+          class="header-icon"
+          th:if="${session.user != null}"
+        >
+          <i class="bi bi-box-arrow-right"></i>
+        </a>
+        <a
+          href="/java5/asm/cart"
+          class="header-icon position-relative"
+          th:if="${session.user != null}"
+        >
+          <i class="bi bi-bag"></i>
+          <span
+            id="cart-count"
+            class="position-absolute translate-middle badge rounded-pill"
+            th:text="${session.cartCount != null ? session.cartCount : 0}"
+            >0</span
+          >
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript cho thanh tìm kiếm -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const searchInput = document.getElementById("searchInput");
+      const searchBtn = document.getElementById("searchBtn");
+      const searchSuggestions = document.querySelector(".search-suggestions");
+
+      // Thêm sự kiện cho nút tìm kiếm để focus vào input khi click
+      searchBtn.addEventListener("click", function () {
+        searchInput.focus();
+        searchInput.style.width = "200px";
+        searchInput.style.padding = "0 15px";
+        searchInput.style.opacity = "1";
+        searchInput.style.border = "1px solid #ddd";
+
+        if (window.innerWidth <= 576) {
+          searchInput.style.width = "150px";
+        }
+      });
+
+      // Xử lý khi nhập vào input
+      searchInput.addEventListener("input", function () {
+        if (searchInput.value.length > 0) {
+          searchSuggestions.style.display = "block";
+        } else {
+          searchSuggestions.style.display = "none";
+        }
+      });
+
+      // Submit tìm kiếm khi nhấn Enter
+      searchInput.addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+          console.log("Search submitted:", searchInput.value);
+          window.location.href =
+            "/java5/asm/search?q=" + encodeURIComponent(searchInput.value);
+        }
+      });
+
+      // Ẩn gợi ý khi click ra ngoài
+      document.addEventListener("click", function (e) {
+        if (!e.target.closest(".search-container")) {
+          searchSuggestions.style.display = "none";
+          if (document.activeElement !== searchInput) {
+            searchInput.style.width = "0";
+            searchInput.style.padding = "0";
+            searchInput.style.opacity = "0";
+            searchInput.style.border = "none";
+          }
+        }
+      });
+
+      // Giữ kích thước input khi focus
+      searchInput.addEventListener("focus", function () {
+        this.style.width = window.innerWidth <= 576 ? "150px" : "200px";
+        this.style.padding = "0 15px";
+        this.style.opacity = "1";
+        this.style.border = "1px solid #ddd";
+      });
+
+      // Ẩn input khi blur và không hover
+      searchInput.addEventListener("blur", function () {
+        if (!document.querySelector(".search-container:hover")) {
+          this.style.width = "0";
+          this.style.padding = "0";
+          this.style.opacity = "0";
+          this.style.border = "none";
+        }
+      });
+
+      // Cập nhật kích thước khi resize
+      window.addEventListener("resize", function () {
+        if (
+          document.activeElement === searchInput ||
+          document.querySelector(".search-container:hover")
+        ) {
+          searchInput.style.width =
+            window.innerWidth <= 576 ? "150px" : "200px";
+        }
+      });
+    });
+  </script>
+</header>

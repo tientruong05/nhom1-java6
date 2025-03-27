@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html th:replace="~{/layout::view(~{::title}, ~{::body}, ~{::style})}">
+<head>
+    <title>Thống kê doanh thu theo loại hàng</title>
+    <style>
+        body {
+            background: #111111;
+            color: #D4AF37;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+            color: #D4AF37;
+            font-weight: 300;
+            letter-spacing: 1px;
+            margin-bottom: 30px;
+        }
+
+        #product-stats {
+            background: #222222;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(212, 175, 55, 0.15);
+            padding: 30px;
+            margin-top: 20px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        table {
+            border-collapse: separate;
+            border-spacing: 0 8px;
+            width: 100%;
+        }
+
+        table thead tr th {
+            background-color: #111111 !important;
+            color: #D4AF37 !important;
+            text-align: center;
+            border: none !important;
+            padding: 15px;
+            font-weight: 400;
+            letter-spacing: 1px;
+        }
+
+        tbody tr {
+            background: rgba(212, 175, 55, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        tbody tr:hover {
+            background: rgba(212, 175, 55, 0.1);
+            transform: scale(1.01);
+        }
+
+        tbody td {
+            border: none !important;
+            color: #fff;
+            padding: 15px;
+            vertical-align: middle;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <h1>Thống kê doanh thu theo loại hàng</h1>
+        <div id="product-stats">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Tên loại hàng</th>
+                        <th>Tên thương hiệu</th>
+                        <th>Tổng doanh thu</th>
+                        <th>Tổng số lượng</th>
+                        <th>Giá cao nhất</th>
+                        <th>Giá thấp nhất</th>
+                        <th>Giá trung bình</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="stat : ${revenueStats}">
+                        <td th:text="${stat.categoryName}"></td>
+                        <td th:text="${stat.subName}"></td>
+                        <td th:text="${#numbers.formatDecimal(stat.totalRevenue, 0, 'COMMA', 0, 'POINT') + 'VNĐ'}"></td>
+                        <td th:text="${stat.totalQty}"></td>
+                        <td th:text="${#numbers.formatDecimal(stat.maxPrice, 0, 'COMMA', 0, 'POINT') + 'VNĐ'}"></td>
+                        <td th:text="${#numbers.formatDecimal(stat.minPrice, 0, 'COMMA', 0, 'POINT') + 'VNĐ'}"></td>
+                        <td th:text="${#numbers.formatDecimal(stat.avgPrice, 0, 'COMMA', 0, 'POINT') + 'VNĐ'}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
