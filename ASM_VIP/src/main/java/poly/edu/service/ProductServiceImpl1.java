@@ -16,7 +16,6 @@ import poly.edu.repository.DiscountDetailRepository;
 import poly.edu.repository.ProductRepository;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -48,6 +47,12 @@ public class ProductServiceImpl1 implements ProductService {
 
     @Override
     public ProductEntity saveProduct(ProductEntity product) {
+        if (product.getId() > 0) {
+            Optional<ProductEntity> existingProduct = productRepository.findById(product.getId());
+            if (existingProduct.isPresent() && product.getImage() == null) {
+                product.setImage(existingProduct.get().getImage());
+            }
+        }
         return productRepository.save(product);
     }
 
@@ -111,31 +116,29 @@ public class ProductServiceImpl1 implements ProductService {
 
     @Override
     public Page<ProductEntity> findSearchAll(String name, Pageable pageable) {
-        String searchPattern = "%" + name + "%";
-        return productRepository.findSearchAll(searchPattern, pageable);
+        return productRepository.findSearchAll(name, pageable);
     }
 
     @Override
     public Page<ProductDTO> getFilteredProducts(String search, Integer categoryId, Integer subCategoryId, Integer status, Pageable pageable) {
         Page<ProductEntity> productPage = productRepository.findByFilters(search, categoryId, subCategoryId, status, pageable);
 
-        // Ánh xạ ProductEntity sang ProductDTO và áp dụng giảm giá
         return productPage.map(product -> {
             ProductDTO productDTO = new ProductDTO();
             productDTO.setId(product.getId());
             productDTO.setName(product.getName());
             productDTO.setImage(product.getImage());
             productDTO.setPrice(product.getPrice());
-
-            // Áp dụng giảm giá
+            productDTO.setQty(product.getQty());
+            productDTO.setDescription(product.getDescription());
+            productDTO.setStatus(product.getStatus());
+            productDTO.setSubCategory(product.getSubCategory());
             applyDiscountToProduct(productDTO, product.getId(), categoryId, subCategoryId);
-
             return productDTO;
         });
     }
 
     private void applyDiscountToProduct(ProductDTO productDTO, int productId, Integer categoryId, Integer subCategoryId) {
-        // Tìm các DiscountDetail áp dụng cho sản phẩm, danh mục, hoặc danh mục con
         List<DiscountDetailEntity> discountDetails = discountDetailRepository.findByProductIdAndStatus(productId, 1);
 
         if (discountDetails.isEmpty() && categoryId != null) {
@@ -146,7 +149,6 @@ public class ProductServiceImpl1 implements ProductService {
             discountDetails = discountDetailRepository.findBySubCategoryIdAndStatus(subCategoryId, 1);
         }
 
-        // Tìm chương trình giảm giá đang hoạt động
         for (DiscountDetailEntity detail : discountDetails) {
             DiscountEntity discount = detail.getDiscount();
             if (discount != null && discount.isActive()) {
@@ -155,7 +157,7 @@ public class ProductServiceImpl1 implements ProductService {
                 float originalPrice = productDTO.getPrice();
                 float discountedPrice = originalPrice - (originalPrice * discountValue / 100);
                 productDTO.setDiscountedPrice(discountedPrice);
-                break; // Chỉ áp dụng chương trình giảm giá đầu tiên
+                break;
             }
         }
     }
