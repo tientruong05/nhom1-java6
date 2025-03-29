@@ -16,4 +16,4 @@ public class ProductDTO {
     private Float discountPercentage;
     private int qty;
     private int sellProgress; // % tiến trình đã bán
-}
+} 

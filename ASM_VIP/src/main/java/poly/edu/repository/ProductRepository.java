@@ -69,4 +69,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
            "WHERE d.status = 1 AND dd.status = 1 " +
            "AND d.startDate <= CURRENT_DATE AND d.endDate >= CURRENT_DATE")
     List<ProductEntity> findProductsWithActiveDiscounts(Pageable pageable);
+
+    @Query("SELECT p FROM ProductEntity p WHERE p.id IN :ids AND p.status = :status")
+    List<ProductEntity> findByIdInAndStatus(@Param("ids") List<Integer> ids, @Param("status") int status);
 }
