@@ -166,6 +166,8 @@
             background: #111111;
             border: 1px solid #D4AF37;
             color: #fff;
+            height: 40px;
+            padding: 8px;
         }
 
         .form-control:focus, .form-select:focus {
@@ -256,6 +258,34 @@
             border: 1px solid rgba(212, 175, 55, 0.2);
         }
 
+        .search-filter-container .row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-filter-container .col-lg-3,
+        .search-filter-container .col-lg-2 {
+            flex: 0 0 auto;
+            width: 200px;
+        }
+
+        .search-filter-container .btn-primary {
+            background: #D4AF37;
+            color: #111111;
+            border: none;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 0;
+        }
+
+        .search-filter-container .btn-primary:hover {
+            background: #B4941E;
+        }
+
         .alert {
             border-radius: 8px;
             padding: 12px 15px;
@@ -288,7 +318,6 @@
             filter: invert(1);
         }
 
-        /* Cải thiện modal xác nhận xóa */
         .modal-body .delete-warning {
             display: flex;
             align-items: center;
@@ -305,7 +334,6 @@
             color: #D4AF37;
         }
 
-        /* Hiệu ứng mở modal */
         .modal.fade .modal-dialog {
             transition: transform 0.3s ease-out;
             transform: translate(0, -50px);
@@ -326,6 +354,15 @@
             .btn-success {
                 padding: 8px 15px;
             }
+            .search-filter-container .col-lg-3,
+            .search-filter-container .col-lg-2 {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            .search-filter-container .row {
+                flex-direction: column;
+                gap: 0;
+            }
         }
     </style>
 </head>
@@ -334,7 +371,6 @@
         <div class="table-container">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2>Quản lý sản phẩm</h2>
-                <!-- Thông báo -->
                 <div th:if="${param.success}" class="alert alert-success alert-dismissible fade show" role="alert">
                     <i class="fas fa-check-circle"></i>
                     Thao tác thành công!
@@ -360,15 +396,15 @@
                         <input type="text" class="form-control" name="search" th:value="${search}" placeholder="Tìm kiếm theo tên, loại hàng, hãng..." />
                     </div>
                     <div class="col-lg-2">
-                        <select class="form-select" name="categoryId">
+                        <select class="form-select" name="categoryId" id="filterCategory" onchange="filterSubCategoriesForFilter()">
                             <option value="" th:selected="${categoryId == null}">Tất cả loại hàng</option>
                             <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}" th:selected="${categoryId == cat.id}"></option>
                         </select>
                     </div>
                     <div class="col-lg-2">
-                        <select class="form-select" name="subCategoryId">
+                        <select class="form-select" name="subCategoryId" id="filterSubCategory">
                             <option value="" th:selected="${subCategoryId == null}">Tất cả hãng</option>
-                            <option th:each="subcat : ${subcategories}" th:value="${subcat.id}" th:text="${subcat.subCategoriesName}" th:selected="${subCategoryId == subcat.id}"></option>
+                            <option th:each="subcat : ${subcategories}" th:value="${subcat.id}" th:text="${subcat.subCategoriesName}" th:data-category="${subcat.category.id}" th:selected="${subCategoryId == subcat.id}"></option>
                         </select>
                     </div>
                     <div class="col-lg-2">
@@ -427,6 +463,7 @@
                                 <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editProductModal" 
                                         th:attr="data-id=${product.id}, 
                                                 data-name=${product.name}, 
+                                                data-category=${product.subCategory?.category?.id}, 
                                                 data-subcategory=${product.subCategory?.id}, 
                                                 data-price=${product.price}, 
                                                 data-qty=${product.qty}, 
@@ -435,7 +472,6 @@
                                                 data-image=${product.image}">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <!-- Thay thẻ <a> bằng <button> để mở modal xác nhận xóa -->
                                 <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"
                                         th:attr="data-id=${product.id}, data-name=${product.name}">
                                     <i class="fas fa-trash"></i>
@@ -449,7 +485,6 @@
                 </tbody>
             </table>
 
-            <!-- Phân trang kiểu Google -->
             <nav aria-label="Page navigation" th:if="${totalPages > 1}">
                 <ul class="pagination">
                     <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
@@ -481,10 +516,17 @@
                                     <input type="text" name="name" class="form-control" required>
                                 </div>
                                 <div class="mb-3">
+                                    <label class="form-label">Loại hàng</label>
+                                    <select name="category.id" class="form-select" required id="addCategory" onchange="filterSubCategories()">
+                                        <option value="" disabled selected>Chọn loại hàng</option>
+                                        <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
                                     <label class="form-label">Hãng</label>
-                                    <select name="subCategory.id" class="form-select" required>
+                                    <select name="subCategory.id" class="form-select" required id="addSubCategory">
                                         <option value="" disabled selected>Chọn hãng</option>
-                                        <option th:each="subcat : ${subcategories}" th:value="${subcat.id}" th:text="${subcat.subCategoriesName}"></option>
+                                        <option th:each="subcat : ${subcategories}" th:value="${subcat.id}" th:text="${subcat.subCategoriesName}" th:data-category="${subcat.category.id}"></option>
                                     </select>
                                 </div>
                                 <div class="mb-3">
@@ -536,10 +578,17 @@
                                     <input type="text" id="edit-product-name" name="name" class="form-control" required>
                                 </div>
                                 <div class="mb-3">
+                                    <label class="form-label">Loại hàng</label>
+                                    <select name="category.id" class="form-select" required id="editCategory" onchange="filterSubCategoriesEdit()">
+                                        <option value="" disabled>Chọn loại hàng</option>
+                                        <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
                                     <label class="form-label">Hãng</label>
                                     <select name="subCategory.id" class="form-select" required id="editSubCategory">
                                         <option value="" disabled>Chọn hãng</option>
-                                        <option th:each="subcat : ${subcategories}" th:value="${subcat.id}" th:text="${subcat.subCategoriesName}"></option>
+                                        <option th:each="subcat : ${subcategories}" th:value="${subcat.id}" th:text="${subcat.subCategoriesName}" th:data-category="${subcat.category.id}"></option>
                                     </select>
                                 </div>
                                 <div class="mb-3">
@@ -609,12 +658,12 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Xử lý modal sửa sản phẩm
             const editModal = document.getElementById('editProductModal');
             editModal.addEventListener('show.bs.modal', function (event) {
                 const button = event.relatedTarget;
                 const id = button.getAttribute('data-id');
                 const name = button.getAttribute('data-name');
+                const category = button.getAttribute('data-category');
                 const subcategory = button.getAttribute('data-subcategory');
                 const price = button.getAttribute('data-price');
                 const qty = button.getAttribute('data-qty');
@@ -624,16 +673,17 @@
 
                 document.getElementById('edit-product-id').value = id;
                 document.getElementById('edit-product-name').value = name;
+                document.getElementById('editCategory').value = category || '';
+                filterSubCategoriesEdit();
+                document.getElementById('editSubCategory').value = subcategory || '';
                 document.getElementById('edit-product-price').value = price;
                 document.getElementById('edit-product-qty').value = qty;
                 document.getElementById('edit-product-description').value = description || '';
                 document.getElementById('edit-product-status').value = status;
                 document.getElementById('edit-product-image').value = image;
                 document.getElementById('edit-product-image-preview').src = image ? `/photos/${image}` : '/photos/default.png';
-                document.getElementById('editSubCategory').value = subcategory || '';
             });
 
-            // Xử lý modal xác nhận xóa
             const deleteModal = document.getElementById('deleteConfirmModal');
             deleteModal.addEventListener('show.bs.modal', function (event) {
                 const button = event.relatedTarget;
@@ -641,10 +691,55 @@
                 const name = button.getAttribute('data-name');
 
                 document.getElementById('delete-product-name').textContent = name;
-                const deleteLink = document.getElementById('delete-product-link');
-                deleteLink.href = `/java5/asm/crud/products/delete/${id}`;
+                document.getElementById('delete-product-link').href = `/java5/asm/crud/products/delete/${id}`;
             });
+
+            // Gọi hàm lọc khi trang tải để đảm bảo giá trị ban đầu
+            filterSubCategoriesForFilter();
         });
+
+        function filterSubCategories() {
+            const categoryId = document.getElementById('addCategory').value;
+            const subCategorySelect = document.getElementById('addSubCategory');
+            const options = subCategorySelect.querySelectorAll('option:not([value=""])');
+
+            options.forEach(option => {
+                const optionCategoryId = option.getAttribute('data-category');
+                option.style.display = (categoryId === '' || optionCategoryId === categoryId) ? '' : 'none';
+                if (option.style.display === 'none' && option.selected) {
+                    option.selected = false;
+                }
+            });
+        }
+
+        function filterSubCategoriesEdit() {
+            const categoryId = document.getElementById('editCategory').value;
+            const subCategorySelect = document.getElementById('editSubCategory');
+            const options = subCategorySelect.querySelectorAll('option:not([value=""])');
+
+            options.forEach(option => {
+                const optionCategoryId = option.getAttribute('data-category');
+                option.style.display = (categoryId === '' || optionCategoryId === categoryId) ? '' : 'none';
+                if (option.style.display === 'none' && option.selected) {
+                    option.selected = false;
+                }
+            });
+        }
+
+        // Hàm lọc cho thanh lọc
+        function filterSubCategoriesForFilter() {
+            const categoryId = document.getElementById('filterCategory').value;
+            const subCategorySelect = document.getElementById('filterSubCategory');
+            const options = subCategorySelect.querySelectorAll('option:not([value=""])');
+
+            options.forEach(option => {
+                const optionCategoryId = option.getAttribute('data-category');
+                option.style.display = (categoryId === '' || optionCategoryId === categoryId) ? '' : 'none';
+                if (option.style.display === 'none' && option.selected) {
+                    option.selected = false;
+                }
+            });
+        }
     </script>
 </body>
 </html>

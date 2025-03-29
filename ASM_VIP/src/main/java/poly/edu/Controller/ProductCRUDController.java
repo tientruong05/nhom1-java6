@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import poly.edu.DTO.ProductDTO;
+import poly.edu.entity.CategoryEntity;
 import poly.edu.entity.ProductEntity;
 import poly.edu.entity.SubCategoryEntity;
 import poly.edu.service.CategoryService;
@@ -80,6 +81,7 @@ public class ProductCRUDController {
 
     @PostMapping("/save")
     public String saveProduct(@RequestParam("name") String name,
+                              @RequestParam("category.id") Integer categoryId,
                               @RequestParam("subCategory.id") Integer subCategoryId,
                               @RequestParam("price") String priceStr,
                               @RequestParam("qty") Integer qty,
@@ -114,16 +116,25 @@ public class ProductCRUDController {
             }
             product.setPrice(price);
 
-            // Xử lý SubCategory
-            Optional<SubCategoryEntity> subCategory = Optional.ofNullable(subCategoryService.getSubCategoryById(subCategoryId));
-            if (subCategory.isPresent()) {
-                product.setSubCategory(subCategory.get());
-            } else {
-                return "redirect:/java5/asm/crud/products?error=" + URLEncoder.encode("Hãng không hợp lệ", StandardCharsets.UTF_8);
+            // Xử lý Category
+            Optional<CategoryEntity> category = Optional.ofNullable(categoryService.getCategoryById(categoryId));
+            if (!category.isPresent()) {
+                return "redirect:/java5/asm/crud/products?error=" + URLEncoder.encode("Loại hàng không hợp lệ", StandardCharsets.UTF_8);
             }
 
+            // Xử lý SubCategory
+            Optional<SubCategoryEntity> subCategory = Optional.ofNullable(subCategoryService.getSubCategoryById(subCategoryId));
+            if (!subCategory.isPresent()) {
+                return "redirect:/java5/asm/crud/products?error=" + URLEncoder.encode("Hãng không hợp lệ", StandardCharsets.UTF_8);
+            }
+            // Kiểm tra subCategory có thuộc category không - Sửa lỗi equals
+            if (subCategory.get().getCategory().getId() != categoryId) {
+                return "redirect:/java5/asm/crud/products?error=" + URLEncoder.encode("Hãng không thuộc loại hàng đã chọn", StandardCharsets.UTF_8);
+            }
+            product.setSubCategory(subCategory.get());
+
             // Xử lý status
-            product.setStatus("1".equals(status) ? 1 : 0);
+            product.setStatus(status != null && status.equals("1") ? 1 : 0);
 
             // Xử lý upload ảnh
             try {
@@ -152,15 +163,14 @@ public class ProductCRUDController {
                             }
                         });
 
-                // Nếu không có ảnh mới
                 if (product.getImage() == null) {
-                    if (id == 0) { // Sản phẩm mới
+                    if (id == 0) {
                         product.setImage("default.png");
-                    } else { // Sản phẩm cũ
+                    } else {
                         if (existingImage == null || existingImage.isEmpty()) {
                             return "redirect:/java5/asm/crud/products?error=" + URLEncoder.encode("Ảnh hiện tại không hợp lệ", StandardCharsets.UTF_8);
                         }
-                        product.setImage(existingImage); // Giữ ảnh hiện tại
+                        product.setImage(existingImage);
                     }
                 }
             } catch (RuntimeException e) {
