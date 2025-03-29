@@ -10,10 +10,11 @@ import poly.edu.entity.SubCategoryEntity;
 import poly.edu.service.CategoryService;
 import poly.edu.service.SubCategoryService;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Optional;
 
 @Controller
-@RequestMapping("/java5/asm/crud/categories")
+@RequestMapping("/java5/asm/crud/subcategories")
 public class SubCategoryController {
 
     @Autowired
@@ -22,11 +23,18 @@ public class SubCategoryController {
     @Autowired
     private CategoryService categoryService;
 
+    /**
+     * Hiển thị danh sách thương hiệu theo danh mục được chọn, có phân trang
+     */
     @GetMapping
-    public String getSubCategoriesByCategory(@RequestParam(defaultValue = "1") int page,
-                                             @RequestParam(defaultValue = "10") int size,
-                                             @RequestParam(required = false) String categoryName,
-                                             Model model) {
+    public String getSubCategoriesByCategory(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String categoryName,
+            @RequestParam(required = false) String error,
+            @RequestParam(required = false) String success,
+            Model model) {
+        // Xác định danh mục được chọn, nếu không có thì lấy danh mục đầu tiên
         String selectedCategory = Optional.ofNullable(categoryName)
                 .filter(name -> !name.trim().isEmpty())
                 .orElseGet(() -> categoryService.getAllCategories().stream()
@@ -34,55 +42,111 @@ public class SubCategoryController {
                         .map(CategoryEntity::getName)
                         .orElse(""));
 
+        // Lấy danh sách thương hiệu theo danh mục với phân trang
         Page<SubCategoryEntity> subCategoryPage = subCategoryService.getSubCategoriesByCategory(selectedCategory, page - 1, size);
 
+        // Truyền dữ liệu vào model
         model.addAttribute("subCategories", subCategoryPage.getContent());
         model.addAttribute("categories", categoryService.getAllCategories());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", subCategoryPage.getTotalPages());
         model.addAttribute("selectedCategory", selectedCategory);
+        model.addAttribute("error", error);
+        model.addAttribute("success", success);
+
         return "subcategories";
     }
 
-    @GetMapping("/add")
-    public String showAddForm(Model model) {
-        model.addAttribute("subcategory", new SubCategoryEntity());
-        model.addAttribute("categories", categoryService.getAllCategories());
-        return "subcategory-form";
-    }
-
+    /**
+     * Xử lý lưu thương hiệu (thêm mới hoặc cập nhật)
+     * @throws UnsupportedEncodingException 
+     */
     @PostMapping("/save")
-    public String saveSubCategory(@ModelAttribute SubCategoryEntity subCategory,
-                                  @RequestParam("categoryId") int categoryId) {
-        CategoryEntity category = categoryService.getCategoryById(categoryId);
-        if (category != null) {
+    public String saveSubCategory(
+            @RequestParam("id") Optional<Integer> id,
+            @RequestParam("categoryName") String categoryName,
+            @RequestParam("subCategoriesName") String subCategoriesName,
+            @RequestParam("status") int status,
+            Model model) throws UnsupportedEncodingException {
+        try {
+            // Kiểm tra xem thương hiệu (categoryName) đã tồn tại chưa
+            CategoryEntity category = categoryService.getAllCategories().stream()
+                    .filter(cat -> cat.getName().equalsIgnoreCase(categoryName.trim()))
+                    .findFirst()
+                    .orElse(null);
+
+            // Nếu thương hiệu chưa tồn tại, tạo mới
+            if (category == null) {
+                category = new CategoryEntity();
+                category.setName(categoryName.trim());
+                category.setStatus(1);
+                categoryService.createCategory(category);
+            }
+
+            // Tạo hoặc cập nhật SubCategoryEntity
+            SubCategoryEntity subCategory;
+            if (id.isPresent() && id.get() > 0) {
+                subCategory = subCategoryService.getSubCategoryById(id.get());
+                if (subCategory == null) {
+                    return "redirect:/java5/asm/crud/subcategories?error=" + java.net.URLEncoder.encode("Không tìm thấy thương hiệu với ID: " + id.get(), "UTF-8");
+                }
+            } else {
+                subCategory = new SubCategoryEntity();
+            }
+
+            subCategory.setSubCategoriesName(subCategoriesName);
             subCategory.setCategory(category);
+            subCategory.setStatus(status);
+
             if (subCategory.getId() == 0) {
                 subCategoryService.addSubCategory(subCategory);
+                return "redirect:/java5/asm/crud/subcategories?success=" + java.net.URLEncoder.encode("Thêm thương hiệu thành công", "UTF-8");
             } else {
                 subCategoryService.updateSubCategory(subCategory);
+                return "redirect:/java5/asm/crud/subcategories?success=" + java.net.URLEncoder.encode("Cập nhật thương hiệu thành công", "UTF-8");
             }
-        } else {
-            throw new IllegalArgumentException("Category with ID " + categoryId + " not found.");
+        } catch (Exception e) {
+            return "redirect:/java5/asm/crud/subcategories?error=" + java.net.URLEncoder.encode("Lỗi khi lưu thương hiệu: " + e.getMessage(), "UTF-8");
         }
-        return "redirect:/java5/asm/crud/categories";
     }
 
-    @GetMapping("/edit/{id}")
-    public String showEditForm(@PathVariable int id, Model model) {
-        return Optional.ofNullable(subCategoryService.getSubCategoryById(id))
-                .map(subCategory -> {
-                    model.addAttribute("subcategory", subCategory);
-                    model.addAttribute("categories", categoryService.getAllCategories());
-                    return "subcategory-form";
-                })
-                .orElse("redirect:/java5/asm/crud/categories");
-    }
-
+    /**
+     * Xóa thương hiệu theo ID và hiển thị thông báo trong modal
+     */
     @GetMapping("/delete/{id}")
-    public String deleteSubCategory(@PathVariable int id) {
-        Optional.ofNullable(subCategoryService.getSubCategoryById(id))
-                .ifPresent(subCategory -> subCategoryService.deleteSubCategory(id));
-        return "redirect:/java5/asm/crud/categories";
+    public String deleteSubCategory(
+            @PathVariable int id,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(required = false) String categoryName,
+            Model model) {
+        try {
+            Optional<SubCategoryEntity> subCategoryOpt = Optional.ofNullable(subCategoryService.getSubCategoryById(id));
+            if (subCategoryOpt.isPresent()) {
+                subCategoryService.deleteSubCategory(id);
+                model.addAttribute("modalMessage", "Xóa thương hiệu thành công");
+            } else {
+                model.addAttribute("modalMessage", "Không tìm thấy thương hiệu với ID: " + id);
+            }
+        } catch (Exception e) {
+            model.addAttribute("modalMessage", "Lỗi khi xóa thương hiệu: " + e.getMessage());
+        }
+
+        // Tải lại danh sách thương hiệu
+        String selectedCategory = Optional.ofNullable(categoryName)
+                .filter(name -> !name.trim().isEmpty())
+                .orElseGet(() -> categoryService.getAllCategories().stream()
+                        .findFirst()
+                        .map(CategoryEntity::getName)
+                        .orElse(""));
+
+        Page<SubCategoryEntity> subCategoryPage = subCategoryService.getSubCategoriesByCategory(selectedCategory, page - 1, 10);
+        model.addAttribute("subCategories", subCategoryPage.getContent());
+        model.addAttribute("categories", categoryService.getAllCategories());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", subCategoryPage.getTotalPages());
+        model.addAttribute("selectedCategory", selectedCategory);
+        model.addAttribute("showModal", true); // Dùng để hiển thị modal
+
+        return "subcategories";
     }
 }
