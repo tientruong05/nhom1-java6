@@ -146,7 +146,7 @@ public class ProductServiceImpl1 implements ProductService {
             productDTO.setQty(product.getQty());
             productDTO.setDescription(product.getDescription());
             productDTO.setStatus(product.getStatus());
-            productDTO.setSubCategory(product.getSubCategory());
+            productDTO.setSubsetSubCategory(product.getSubCategory().getSubCategoriesName());
             applyDiscountToProduct(productDTO, product.getId(), categoryId, subCategoryId);
             return productDTO;
         });
