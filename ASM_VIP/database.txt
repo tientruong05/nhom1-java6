@@ -1,0 +1,573 @@
+create database java6
+go
+use java6
+go
+
+
+CREATE TABLE categories (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    name NVARCHAR(100) NOT NULL UNIQUE,
+    description NVARCHAR(MAX),
+--    country NVARCHAR(100),
+--    founded_year INT,
+    status INT DEFAULT 1 -- 1: Active, 0: Inactive
+);
+GO
+CREATE TABLE sub_categories (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    id_categories INT NOT NULL,
+    sub_categories_name NVARCHAR(100) NOT NULL,
+    status INT DEFAULT 1,
+    FOREIGN KEY (id_categories) REFERENCES categories(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+GO
+CREATE TABLE products (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    id_subcategories INT NOT NULL,
+    name NVARCHAR(100) NOT NULL,
+    image NVARCHAR(MAX),
+    price FLOAT NOT NULL,
+    qty INT NOT NULL,
+    description NVARCHAR(MAX),
+    status INT DEFAULT 1, -- 1: Active, 0: Inactive
+--	createDate DATE,
+    FOREIGN KEY (id_subcategories) REFERENCES sub_categories(id) ON DELETE CASCADE ON UPDATE CASCADE,
+);
+GO
+CREATE TABLE discounts (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    discount_name NVARCHAR(max) NOT NULL,
+    --discount_type NVARCHAR(50) NOT NULL, -- Percent hoặc Amount
+    discount_value FLOAT NOT NULL, -- Giá trị giảm giá (% hoặc số tiền cụ thể)
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    status INT DEFAULT 1 -- 1: Active, 0: Inactive
+);
+GO
+CREATE TABLE discount_details (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    discount_id INT NOT NULL,
+    categories_id INT NULL,         -- Giảm giá theo hãng
+    subcategories_id INT NULL,      -- Giảm giá theo bộ sưu tập
+    product_id INT NULL,            -- Giảm giá theo sản phẩm cụ thể
+    FOREIGN KEY (discount_id) REFERENCES discounts(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (categories_id) REFERENCES categories(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
+    FOREIGN KEY (subcategories_id) REFERENCES sub_categories(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
+	status INT DEFAULT 1
+);
+GO
+CREATE TABLE users (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    username NVARCHAR(100) NOT NULL UNIQUE,
+    password NVARCHAR(255) NOT NULL,
+    email NVARCHAR(255) NOT NULL unique,
+    full_name NVARCHAR(255),
+    phone NVARCHAR(11) unique not null,
+    address NVARCHAR(255),
+    role INT DEFAULT 0,  -- 0: User, 1: Admin
+    status INT DEFAULT 1  -- 1: Active, 0: Inactive
+);
+go
+-- Tạo bảng orders (Đơn hàng)
+CREATE TABLE orders (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    user_id INT NOT NULL,
+	address NVARCHAR(max),
+	phone NVARCHAR(11),
+	fullname NVARCHAR(100),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+go
+-- Tạo bảng order_detail (Chi tiết đơn hàng)
+CREATE TABLE order_detail (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    order_id INT NOT NULL,
+    product_id INT NOT NULL,
+	
+    qty INT NOT NULL,
+	price float not null,
+    order_date date NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES orders(id) ,
+    FOREIGN KEY (product_id) REFERENCES products(id)  on update no action
+)
+go
+
+CREATE TABLE cart (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+	user_id INT NOT NULL,
+    product_id INT NOT NULL,
+    qty INT NOT NULL,
+	price float not null,
+	FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (product_id) REFERENCES products(id)  on update no action,
+);
+go
+
+INSERT INTO users (username, password, email, full_name, phone, address, role, status) VALUES
+(N'khanghp', N'MTIzNDU2', N'khanghp@gmail.com', N'Huỳnh Phúc Khang', N'0123456789', N'123 Thanh Niên, Ngô Mây, Quy Nhơn', 0, 1),
+(N'admin', N'MTIzNDU2', N'admin@gmail.com', N'Admin User', N'0987654321', N'456 Admin, Quy Nhơn', 1, 1),
+(N'tientm', N'MTIzNDU2', N'tientm@gmail.com', N'Trương Minh Tiến', N'0123789889', N'123 Xuân Lê, Nhơn Bình, Quy Nhơn', 0, 1),
+(N'lyntb', N'MTIzNDU2', N'lyntb@gmail.com', N'Nguyễn Thị Bảo Ly', N'0123227892', N'12 Bùi Xuân Phái, Hải Cảng, Quy Nhơn', 0, 1),
+(N'nhihu', N'MTIzNDU2', N'nhihu@gmail.com', N'Hồ Uyển Nhi', N'01244456789', N'123 Thanh Niên, Hoài Nhơn', 0, 1),
+(N'nhitty', N'MTIzNDU2', N'nhitty@gmail.com', N'Trần Thị Yến Nhi', N'0123456339', N'123 Thanh Niên, Tuy Phước', 0, 1);
+go
+
+INSERT INTO categories (name, status) VALUES
+(N'Versace', 1),
+( N'Julius', 1),
+(N'Gucci', 1),
+( N'Orient', 1),
+( N'Burberry', 1),
+( N'Knot', 1),
+( N'Citizen', 1),
+( N'Casio', 1),
+( N'Daniel Wellington', 1),
+( N'SevenFriday', 1);
+GO
+INSERT INTO sub_categories VALUES
+(1, N'Đồng hồ nam', 1),
+(2, N'Đồng hồ nam', 1),
+(3, N'Đồng hồ nam', 1),
+(4, N'Đồng hồ nam', 1),
+(5, N'Đồng hồ nam', 1),
+(6, N'Đồng hồ nam', 1),
+(7, N'Đồng hồ nam', 1),
+(8, N'Đồng hồ nam', 1),
+(9, N'Đồng hồ nam', 1),
+(10, N'Đồng hồ nam', 1),
+(1, N'Đồng hồ nữ', 1),
+(2, N'Đồng hồ nữ', 1),
+(3, N'Đồng hồ nữ', 1),
+(4, N'Đồng hồ nữ', 1),
+(5, N'Đồng hồ nữ', 1),
+(6, N'Đồng hồ nữ', 1),
+(7, N'Đồng hồ nữ', 1),
+(8, N'Đồng hồ nữ', 1),
+(9, N'Đồng hồ nữ', 1),
+(10, N'Đồng hồ nữ', 1);
+GO
+
+
+INSERT INTO products(id_subcategories, name, image, price, qty, description, status) VALUES
+-- Đồng hồ Versace dành cho nam (id_subcategories = 1)
+(1, N'Versace V-Race GMT', N'versace_v_race_gmt.jpg', 5000000,  10, N'Versace V-Race GMT, thiết kế mạnh mẽ, phong cách nam tính.', 1),
+(1, N'Versace Urban Chrono', N'versace_urban_chrono.jpg', 6500000,  8, N'Versace Urban Chrono, đồng hồ đa chức năng với thiết kế hiện đại.', 1),
+(1, N'Versace V-Palazzo Empire', N'versace_v_palazzo_empire.jpg', 8500000,  5, N'Versace V-Palazzo Empire, biểu tượng của sự sang trọng.', 1),
+(1, N'Versace Mystique Sport', N'versace_mystique_sport.jpg', 7200000,  7, N'Versace Mystique Sport, phong cách thể thao dành cho phái mạnh.', 1),
+(1, N'Versace Hellenyium', N'versace_hellenyium.jpg', 5500000,  12, N'Versace Hellenyium, thiết kế thanh lịch cho các quý ông.', 1),
+(1, N'Versace Aion', N'versace_aion.jpg', 7800000,  6, N'Versace Aion, phong cách cổ điển kết hợp hiện đại.', 1),
+(1, N'Versace Dylos Icon', N'versace_dylos_icon.jpg', 9900000,  4, N'Versace Dylos Icon, đồng hồ cao cấp cho phái mạnh.', 1),
+(1, N'Versace Greca Chrono', N'versace_greca_chrono.jpg', 8200000,  9, N'Versace Greca Chrono, thiết kế độc đáo và táo bạo.', 1),
+(1, N'Versace Chrono Active', N'versace_chrono_active.jpg', 8800000,  6, N'Versace Chrono Active, đồng hồ dành cho các quý ông năng động.', 1),
+(1, N'Versace Virtus', N'versace_virtus.jpg', 7600000,  7, N'Versace Virtus, đồng hồ cao cấp với thiết kế tinh tế.', 1),
+-- Đồng hồ Versace dành cho nữ (id_subcategories = 11)
+(11, N'Versace V-Motif', N'versace_v_motif.jpg', 5200000,  10, N'Versace V-Motif, thiết kế thanh lịch cho phái đẹp.', 1),
+(11, N'Versace Virtus Infinity', N'versace_virtus_infinity.jpg', 7500000, 8, N'Versace Virtus Infinity, phong cách hiện đại và sang trọng.', 1),
+(11, N'Versace Palazzo Empire', N'versace_palazzo_empire.jpg', 8700000,  5, N'Versace Palazzo Empire, biểu tượng của sự quý phái.', 1),
+(11, N'Versace Greca Logo', N'versace_greca_logo.jpg', 7200000, 7, N'Versace Greca Logo, thiết kế hiện đại với họa tiết đặc trưng.', 1),
+(11, N'Versace Medusa Frame', N'versace_medusa_frame.jpg', 6200000,  9, N'Versace Medusa Frame, biểu tượng Medusa sang trọng.', 1),
+(11, N'Versace Aion Lady', N'versace_aion_lady.jpg', 7800000,  6, N'Versace Aion Lady, phong cách cổ điển dành cho nữ.', 1),
+(11, N'Versace Mystique Foulard', N'versace_mystique_foulard.jpg', 8200000,  4, N'Versace Mystique Foulard, đồng hồ cao cấp với thiết kế tinh xảo.', 1),
+(11, N'Versace Urban Lady', N'versace_urban_lady.jpg', 6800000,  11, N'Versace Urban Lady, dành cho phái đẹp năng động.', 1),
+(11, N'Versace Hellenyium Lady', N'versace_hellenyium_lady.jpg', 8400000,  6, N'Versace Hellenyium Lady, biểu tượng của sự thanh lịch.', 1),
+(11, N'Versace V-Race Lady', N'versace_v_race_lady.jpg', 7900000,  7, N'Versace V-Race Lady, phong cách hiện đại cho phụ nữ.', 1),
+
+-- Đồng hồ Julius - Nam (id_subcategories = 2)
+(2, N'Julius JS-001', N'julius_js_001.jpg', 1500000,  15, N'Đồng hồ nam Julius JS-001 với thiết kế mạnh mẽ và hiện đại.', 1),
+(2, N'Julius JS-002', N'julius_js_002.jpg', 1600000,  12, N'Đồng hồ nam Julius JS-002 dây da cao cấp, phong cách lịch lãm.', 1),
+(2, N'Julius JS-003', N'julius_js_003.jpg', 1700000,  8, N'Đồng hồ nam Julius JS-003, mặt kính chống trầy và chịu nước tốt.', 1),
+(2, N'Julius JS-004', N'julius_js_004.jpg', 1800000,  14, N'Đồng hồ nam Julius JS-004, phong cách cổ điển với vỏ thép không gỉ.', 1),
+(2, N'Julius JS-005', N'julius_js_005.jpg', 1900000,  10, N'Đồng hồ nam Julius JS-005, mặt số độc đáo và thời trang.', 1),
+(2, N'Julius JS-006', N'julius_js_006.jpg', 2000000,  16, N'Đồng hồ nam Julius JS-006, dây kim loại chống gỉ, bền bỉ.', 1),
+(2, N'Julius JS-007', N'julius_js_007.jpg', 2100000,  7, N'Đồng hồ nam Julius JS-007, kiểu dáng thanh lịch, thích hợp cho doanh nhân.', 1),
+(2, N'Julius JS-008', N'julius_js_008.jpg', 2200000, 20, N'Đồng hồ nam Julius JS-008, công nghệ pin bền lâu.', 1),
+(2, N'Julius JS-009', N'julius_js_009.jpg', 2300000,  11, N'Đồng hồ nam Julius JS-009, khả năng chịu nước 5ATM.', 1),
+(2, N'Julius JS-010', N'julius_js_010.jpg', 2400000,  13, N'Đồng hồ nam Julius JS-010, thiết kế thời trang và năng động.', 1),
+-- Đồng hồ Julius - Nữ (id_subcategories = 12)
+(12, N'Julius JL-001', N'julius_jl_001.jpg', 1400000,  15, N'Đồng hồ nữ Julius JL-001 với thiết kế nhẹ nhàng và sang trọng.', 1),
+(12, N'Julius JL-002', N'julius_jl_002.jpg', 1500000,  12, N'Đồng hồ nữ Julius JL-002 dây da cao cấp, phù hợp mọi phong cách.', 1),
+(12, N'Julius JL-003', N'julius_jl_003.jpg', 1600000, 9, N'Đồng hồ nữ Julius JL-003, mặt kính chống trầy, chịu nước tốt.', 1),
+(12, N'Julius JL-004', N'julius_jl_004.jpg', 1700000,  17, N'Đồng hồ nữ Julius JL-004, phong cách cổ điển với mặt số đính đá.', 1),
+(12, N'Julius JL-005', N'julius_jl_005.jpg', 1800000,  20, N'Đồng hồ nữ Julius JL-005, thiết kế dây thép không gỉ.', 1),
+(12, N'Julius JL-006', N'julius_jl_006.jpg', 1900000,  11, N'Đồng hồ nữ Julius JL-006, màu sắc thanh lịch và tinh tế.', 1),
+(12, N'Julius JL-007', N'julius_jl_007.jpg', 2000000,  8, N'Đồng hồ nữ Julius JL-007, thích hợp cho các buổi tiệc và công việc.', 1),
+(12, N'Julius JL-008', N'julius_jl_008.jpg', 2100000,  15, N'Đồng hồ nữ Julius JL-008, công nghệ pin bền lâu, thiết kế sang trọng.', 1),
+(12, N'Julius JL-009', N'julius_jl_009.jpg', 2200000,  10, N'Đồng hồ nữ Julius JL-009, khả năng chịu nước 3ATM.', 1),
+(12, N'Julius JL-010', N'julius_jl_010.jpg', 2300000,  12, N'Đồng hồ nữ Julius JL-010, thiết kế trẻ trung và năng động.', 1),
+
+-- Đồng hồ Knot - Nam (id_subcategories = 6)
+(6, N'Knot Regal Black', N'knot-regal-black.jpg', 4500000,  12, N'Đồng hồ Knot Regal Black mạnh mẽ', 1),
+(6, N'Knot Sand Beige', N'knot-sand-beige.jpg', 4400000,  15, N'Đồng hồ Knot Sand Beige độc đáo', 1),
+(6, N'Knot Sapphire Blue', N'knot-sapphire-blue.jpg', 4700000, 10, N'Đồng hồ Knot Sapphire Blue nổi bật', 1),
+(6, N'Knot Minimalist White', N'knot-minimalist-white.jpg', 4200000,  14, N'Đồng hồ Knot Minimalist White đơn giản', 1),
+(6, N'Knot Metallic Grey', N'knot-metallic-grey.jpg', 4600000,  16, N'Đồng hồ Knot Metallic Grey thời thượng', 1),
+(6, N'Knot Classic Brown', N'knot-classic-brown.jpg', 4500000,  13, N'Đồng hồ Knot Classic Brown tinh tế', 1),
+(6, N'Knot Royal Gold', N'knot-royal-gold.jpg', 5100000, 10, N'Đồng hồ Knot Royal Gold sang trọng', 1),
+(6, N'Knot Dynamic Black', N'knot-dynamic-black.jpg', 4900000,  15, N'Đồng hồ Knot Dynamic Black năng động', 1),
+(6, N'Knot Explorer Green', N'knot-explorer-green.jpg', 4700000,  12, N'Đồng hồ Knot Explorer Green độc lạ', 1),
+(6, N'Knot Chronograph', N'knot-chronograph.jpg', 5300000, 8, N'Đồng hồ Knot Chronograph tinh tế', 1),
+
+-- Đồng hồ Knot - Nữ (id_subcategories = 16)
+(16, N'Knot Elegant Pink', N'knot-elegant-pink.jpg', 4900000,  10, N'Đồng hồ Knot Elegant Pink quyến rũ', 1),
+(16, N'Knot Ruby Red', N'knot-ruby-red.jpg', 5100000,  12, N'Đồng hồ Knot Ruby Red nổi bật', 1),
+(16, N'Knot Pastel Blue', N'knot-pastel-blue.jpg', 4800000,  15, N'Đồng hồ Knot Pastel Blue dịu nhẹ', 1),
+(16, N'Knot Diamond Shine', N'knot-diamond-shine.jpg', 6500000,  8, N'Đồng hồ Knot Diamond Shine quý phái', 1),
+(16, N'Knot Amber Gold', N'knot-amber-gold.jpg', 5200000,  10, N'Đồng hồ Knot Amber Gold sang trọng', 1),
+(16, N'Knot Celestial Grey', N'knot-celestial-grey.jpg', 4700000,  14, N'Đồng hồ Knot Celestial Grey độc đáo', 1),
+(16, N'Knot Sunrise Orange', N'knot-sunrise-orange.jpg', 4800000,  16, N'Đồng hồ Knot Sunrise Orange trẻ trung', 1),
+(16, N'Knot Pearl White', N'knot-pearl-white.jpg', 4900000,  13, N'Đồng hồ Knot Pearl White thanh lịch', 1),
+(16, N'Knot Lavender Bloom', N'knot-lavender-bloom.jpg', 5000000,  9, N'Đồng hồ Knot Lavender Bloom duyên dáng', 1),
+(16, N'Knot Ocean Wave', N'knot-ocean-wave.jpg', 4600000,  11, N'Đồng hồ Knot Ocean Wave mát lành', 1),
+-- Citizen watches for men (id_subcategories = 7)
+(7, N'Citizen Military Green', N'citizen-military-green.jpg', 8800000,  10, N'Đồng hồ Citizen Military Green năng động', 1),
+(7, N'Citizen Sports Chrono', N'citizen-sports-chrono.jpg', 7800000,  15, N'Đồng hồ Citizen Sports Chrono mạnh mẽ', 1),
+(7, N'Citizen Solar Drive', N'citizen-solar-drive.jpg', 8200000, 12, N'Đồng hồ Citizen Solar Drive hiện đại', 1),
+(7, N'Citizen Gold Classic', N'citizen-gold-classic.jpg', 9500000,  10, N'Đồng hồ Citizen Gold Classic sang trọng', 1),
+(7, N'Citizen Blue Ocean', N'citizen-blue-ocean.jpg', 9100000,  15, N'Đồng hồ Citizen Blue Ocean nổi bật', 1),
+(7, N'Citizen Explorer', N'citizen-explorer.jpg', 8600000,  11, N'Đồng hồ Citizen Explorer phiêu lưu', 1),
+(7, N'Citizen Jet Black', N'citizen-jet-black.jpg', 8700000,  9, N'Đồng hồ Citizen Jet Black lịch lãm', 1),
+(7, N'Citizen Heritage', N'citizen-heritage.jpg', 9000000,  13, N'Đồng hồ Citizen Heritage tinh tế', 1),
+(7, N'Citizen Dynamic Silver', N'citizen-dynamic-silver.jpg', 8100000,  16, N'Đồng hồ Citizen Dynamic Silver hiện đại', 1),
+(7, N'Citizen Masterpiece', N'citizen-masterpiece.jpg', 10500000,  12, N'Đồng hồ Citizen Masterpiece đẳng cấp', 1),
+
+-- Citizen watches for women (id_subcategories = 17)
+(17, N'Citizen Rose Charm', N'citizen-rose-charm.jpg', 7500000,  14, N'Đồng hồ Citizen Rose Charm nhẹ nhàng', 1),
+(17, N'Citizen Ocean Blue', N'citizen-ocean-blue.jpg', 8300000,  13, N'Đồng hồ Citizen Ocean Blue mát lành', 1),
+(17, N'Citizen Elegant Black', N'citizen-elegant-black.jpg', 8700000, 10, N'Đồng hồ Citizen Elegant Black cuốn hút', 1),
+(17, N'Citizen Pearl Pink', N'citizen-pearl-pink.jpg', 8100000, 11, N'Đồng hồ Citizen Pearl Pink duyên dáng', 1),
+(17, N'Citizen Shine Gold', N'citizen-shine-gold.jpg', 9200000,  12, N'Đồng hồ Citizen Shine Gold rực rỡ', 1),
+(17, N'Citizen Morning Mist', N'citizen-morning-mist.jpg', 7200000,  10, N'Đồng hồ Citizen Morning Mist thanh nhã', 1),
+(17, N'Citizen Lavender Bliss', N'citizen-lavender-bliss.jpg', 7600000,  13, N'Đồng hồ Citizen Lavender Bliss dịu dàng', 1),
+(17, N'Citizen Starlight', N'citizen-starlight.jpg', 8500000,  15, N'Đồng hồ Citizen Starlight lấp lánh', 1),
+(17, N'Citizen Frost White', N'citizen-frost-white.jpg', 9100000,  14, N'Đồng hồ Citizen Frost White sang trọng', 1),
+(17, N'Citizen Twilight', N'citizen-twilight.jpg', 8900000,  12, N'Đồng hồ Citizen Twilight huyền bí', 1),
+
+-- Gucci watches for men (id_subcategories = 3)
+(3, N'Gucci G-Timeless Automatic', N'gucci-g-timeless-auto.jpg', 25000000,  8, N'Đồng hồ Gucci G-Timeless Automatic với thiết kế sang trọng và đẳng cấp.', 1),
+(3, N'Gucci Dive', N'gucci-dive.jpg', 22000000,  12, N'Đồng hồ Gucci Dive thể thao, chống nước tốt.', 1),
+(3, N'Gucci GG2570', N'gucci-gg2570.jpg', 23500000,  10, N'Đồng hồ Gucci GG2570 với thiết kế độc đáo, mang tính biểu tượng.', 1),
+(3, N'Gucci Interlocking', N'gucci-interlocking.jpg', 24000000, 15, N'Đồng hồ Gucci Interlocking với logo G đặc trưng.', 1),
+(3, N'Gucci Grip', N'gucci-grip.jpg', 26500000,  7, N'Đồng hồ Gucci Grip với thiết kế đột phá và hiện đại.', 1),
+(3, N'Gucci G-Frame', N'gucci-g-frame-m.jpg', 21000000,  14, N'Đồng hồ Gucci G-Frame nam với khung viền thanh lịch.', 1),
+(3, N'Gucci Pantheon', N'gucci-pantheon.jpg', 28000000,  6, N'Đồng hồ Gucci Pantheon với thiết kế cổ điển sang trọng.', 1),
+(3, N'Gucci G-Chrono', N'gucci-g-chrono.jpg', 27500000,  9, N'Đồng hồ Gucci G-Chrono với chức năng bấm giờ thể thao.', 1),
+(3, N'Gucci Digital', N'gucci-digital.jpg', 20500000,  11, N'Đồng hồ Gucci Digital với màn hình kỹ thuật số hiện đại.', 1),
+(3, N'Gucci YA', N'gucci-ya.jpg', 23000000,  13, N'Đồng hồ Gucci YA với thiết kế minimalist tinh tế.', 1),
+
+-- Gucci watches for women (id_subcategories = 13)
+(13, N'Gucci Horsebit', N'gucci-horsebit.jpg', 24500000,  10, N'Đồng hồ Gucci Horsebit với thiết kế nữ tính sang trọng.', 1),
+(13, N'Gucci Diamantissima', N'gucci-diamantissima.jpg', 26000000,  8, N'Đồng hồ Gucci Diamantissima với họa tiết kim cương đặc trưng.', 1),
+(13, N'Gucci G-Timeless Small', N'gucci-g-timeless-small.jpg', 23500000,  12, N'Đồng hồ Gucci G-Timeless phiên bản nhỏ dành cho nữ.', 1),
+(13, N'Gucci Vintage Web', N'gucci-vintage-web.jpg', 22000000, 15, N'Đồng hồ Gucci Vintage Web với dây đeo đặc trưng.', 1),
+(13, N'Gucci Flora', N'gucci-flora.jpg', 25500000, 9, N'Đồng hồ Gucci Flora với họa tiết hoa văn tinh tế.', 1),
+(13, N'Gucci G-Line', N'gucci-g-line.jpg', 21500000,  14, N'Đồng hồ Gucci G-Line thanh lịch dành cho phái đẹp.', 1),
+(13, N'Gucci Bamboo', N'gucci-bamboo.jpg', 27000000,  7, N'Đồng hồ Gucci Bamboo với thiết kế lấy cảm hứng từ tre.', 1),
+(13, N'Gucci Pearl', N'gucci-pearl.jpg', 26500000,  11, N'Đồng hồ Gucci Pearl với điểm nhấn ngọc trai sang trọng.', 1),
+(13, N'Gucci Guccissima', N'gucci-guccissima.jpg', 24000000, 13, N'Đồng hồ Gucci Guccissima với họa tiết logo nổi bật.', 1),
+(13, N'Gucci Swiss', N'gucci-swiss.jpg', 28500000, 6, N'Đồng hồ Gucci Swiss với bộ máy Thụy Sĩ cao cấp.', 1),
+
+-- Casio watches for men (id_subcategories = 8)
+(8, N'Casio G-Shock GA-2100', N'casio-ga2100.jpg', 3500000,  20, N'Đồng hồ Casio G-Shock GA-2100 với thiết kế octagon độc đáo.', 1),
+(8, N'Casio Edifice EFR', N'casio-efr.jpg', 4200000,  15, N'Đồng hồ Casio Edifice EFR với tính năng đo tốc độ.', 1),
+(8, N'Casio Pro Trek PRG', N'casio-prg.jpg', 5500000, 12, N'Đồng hồ Casio Pro Trek PRG với la bàn số.', 1),
+(8, N'Casio Wave Ceptor', N'casio-wave-ceptor.jpg', 3800000, 18, N'Đồng hồ Casio Wave Ceptor với khả năng nhận sóng vô tuyến.', 1),
+(8, N'Casio Databank', N'casio-databank.jpg', 2500000,  25, N'Đồng hồ Casio Databank với bộ nhớ lưu trữ.', 1),
+(8, N'Casio MTG-B2000', N'casio-mtg.jpg', 6500000, 8, N'Đồng hồ Casio MTG-B2000 với công nghệ Bluetooth.', 1),
+(8, N'Casio AE-1200', N'casio-ae1200.jpg', 1800000,  30, N'Đồng hồ Casio AE-1200 World Time đa chức năng.', 1),
+(8, N'Casio MTP', N'casio-mtp.jpg', 2200000, 22, N'Đồng hồ Casio MTP với thiết kế đơn giản, lịch lãm.', 1),
+(8, N'Casio DW-5600', N'casio-dw5600.jpg', 2800000,  20, N'Đồng hồ Casio DW-5600 phiên bản cổ điển.', 1),
+(8, N'Casio AMW', N'casio-amw.jpg', 3200000, 16, N'Đồng hồ Casio AMW với thiết kế thể thao.', 1),
+
+-- Casio watches for women (id_subcategories = 18)
+(18, N'Casio Baby-G BA-110', N'casio-ba110.jpg', 3200000, 18, N'Đồng hồ Casio Baby-G BA-110 năng động cho nữ.', 1),
+(18, N'Casio Sheen SHE', N'casio-she.jpg', 3800000,  15, N'Đồng hồ Casio Sheen SHE với crystals từ Swarovski.', 1),
+(18, N'Casio LTS', N'casio-lts.jpg', 2500000,  20, N'Đồng hồ Casio LTS với thiết kế mỏng nhẹ.', 1),
+(18, N'Casio Vintage LA680', N'casio-la680.jpg', 1500000,  25, N'Đồng hồ Casio Vintage LA680 phong cách retro.', 1),
+(18, N'Casio LTP', N'casio-ltp.jpg', 1800000, 22, N'Đồng hồ Casio LTP với mặt số nhỏ nhắn.', 1),
+(18, N'Casio MSG', N'casio-msg.jpg', 4200000,  12, N'Đồng hồ Casio MSG với thiết kế thể thao nữ tính.', 1),
+(18, N'Casio BGD', N'casio-bgd.jpg', 2800000,  16, N'Đồng hồ Casio BGD với màn hình kỹ thuật số.', 1),
+(18, N'Casio BGA', N'casio-bga.jpg', 3500000,  14, N'Đồng hồ Casio BGA với kim số kết hợp.', 1),
+(18, N'Casio LW', N'casio-lw.jpg', 1600000, 28, N'Đồng hồ Casio LW với thiết kế đơn giản.', 1),
+(18, N'Casio LRW', N'casio-lrw.jpg', 1900000,  20, N'Đồng hồ Casio LRW với nhiều màu sắc trẻ trung.', 1),
+
+-- SevenFriday watches for men (id_subcategories = 10)
+(10, N'SevenFriday P-Series', N'sevenfriday_p_series.jpg', 15000000,  5, N'SevenFriday P-Series, thiết kế công nghiệp táo bạo và sáng tạo.', 1),
+(10, N'SevenFriday M-Series', N'sevenfriday_m_series.jpg', 18000000, 3, N'SevenFriday M-Series, đồng hồ với phong cách hiện đại và mạnh mẽ.', 1),
+(10, N'SevenFriday Q-Series', N'sevenfriday_q_series.jpg', 16500000,  4, N'SevenFriday Q-Series, tích hợp công nghệ cao cấp.', 1),
+(10, N'SevenFriday T-Series', N'sevenfriday_t_series.jpg', 20000000, 2, N'SevenFriday T-Series, đồng hồ sang trọng dành cho phái mạnh.', 1),
+(10, N'SevenFriday S-Series', N'sevenfriday_s_series.jpg', 17000000,  6, N'SevenFriday S-Series, sự kết hợp hoàn hảo giữa thiết kế và chất lượng.', 1),
+(10, N'SevenFriday W-Series', N'sevenfriday_w_series.jpg', 15500000,  7, N'SevenFriday W-Series, phong cách độc đáo cho người yêu thời trang.', 1),
+(10, N'SevenFriday V-Series', N'sevenfriday_v_series.jpg', 18500000,  4, N'SevenFriday V-Series, đồng hồ đỉnh cao của sự khác biệt.', 1),
+(10, N'SevenFriday X-Series', N'sevenfriday_x_series.jpg', 19500000,  3, N'SevenFriday X-Series, biểu tượng thời trang và công nghệ.', 1),
+(10, N'SevenFriday Urban Explorer', N'sevenfriday_urban_explorer.jpg', 21000000, 2, N'SevenFriday Urban Explorer, lựa chọn lý tưởng cho những chuyến phiêu lưu.', 1),
+(10, N'SevenFriday Industrial Essence', N'sevenfriday_industrial_essence.jpg', 19000000,  4, N'SevenFriday Industrial Essence, thiết kế mạnh mẽ và đẳng cấp.', 1),
+
+-- SevenFriday watches for women (id_subcategories = 20)
+(20, N'SevenFriday Lady P-Series', N'sevenfriday_lady_p_series.jpg', 16500000,  5, N'SevenFriday Lady P-Series, thiết kế mạnh mẽ nhưng vẫn giữ sự nữ tính.', 1),
+(20, N'SevenFriday Elegance M-Series', N'sevenfriday_elegance_m_series.jpg', 18000000,  4, N'SevenFriday Elegance M-Series, phong cách hiện đại và thanh lịch.', 1),
+(20, N'SevenFriday Charm Q-Series', N'sevenfriday_charm_q_series.jpg', 17500000, 3, N'SevenFriday Charm Q-Series, thiết kế nhỏ gọn và tinh tế.', 1),
+(20, N'SevenFriday Bloom T-Series', N'sevenfriday_bloom_t_series.jpg', 19000000,  2, N'SevenFriday Bloom T-Series, đồng hồ cao cấp với phong cách hoa văn nổi bật.', 1),
+(20, N'SevenFriday Crystal S-Series', N'sevenfriday_crystal_s_series.jpg', 15000000, 6, N'SevenFriday Crystal S-Series, sự kết hợp giữa phong cách nữ tính và công nghệ cao.', 1),
+(20, N'SevenFriday Aurora W-Series', N'sevenfriday_aurora_w_series.jpg', 16000000, 7, N'SevenFriday Aurora W-Series, thiết kế sáng tạo với sắc màu rực rỡ.', 1),
+(20, N'SevenFriday Chic V-Series', N'sevenfriday_chic_v_series.jpg', 18500000,  4, N'SevenFriday Chic V-Series, đồng hồ lý tưởng cho những quý cô yêu thời trang.', 1),
+(20, N'SevenFriday Grace X-Series', N'sevenfriday_grace_x_series.jpg', 19500000,  3, N'SevenFriday Grace X-Series, biểu tượng sự tinh tế và sang trọng.', 1),
+(20, N'SevenFriday Lady Urban', N'sevenfriday_lady_urban.jpg', 20500000,  2, N'SevenFriday Lady Urban, phong cách năng động và hiện đại.', 1),
+(20, N'SevenFriday Feminine Essence', N'sevenfriday_feminine_essence.jpg', 18000000,  3, N'SevenFriday Feminine Essence, thiết kế cao cấp dành riêng cho phái đẹp.', 1),
+
+-- Burberry watches for men (id_subcategories = 5)
+(5, N'Burberry Heritage', N'burberry_heritage.jpg', 6500000, 10, N'Burberry Heritage, phong cách cổ điển và thanh lịch.', 1),
+(5, N'Burberry Classic Round', N'burberry_classic_round.jpg', 7200000, 8, N'Burberry Classic Round, sự tinh tế trong từng chi tiết.', 1),
+(5, N'Burberry Check Line', N'burberry_check_line.jpg', 8000000,  6, N'Burberry Check Line, thiết kế biểu tượng với họa tiết Check đặc trưng.', 1),
+(5, N'Burberry Modern Slim', N'burberry_modern_slim.jpg', 7800000,  9, N'Burberry Modern Slim, phong cách thanh mảnh và hiện đại.', 1),
+(5, N'Burberry Swiss Made', N'burberry_swiss_made.jpg', 8500000,  5, N'Burberry Swiss Made, đồng hồ Thụy Sĩ cao cấp.', 1),
+(5, N'Burberry Brit Rhythm', N'burberry_brit_rhythm.jpg', 9000000, 4, N'Burberry Brit Rhythm, phong cách trẻ trung và năng động.', 1),
+(5, N'Burberry Iconic Check', N'burberry_iconic_check.jpg', 9500000,  3, N'Burberry Iconic Check, thiết kế độc đáo và biểu tượng của sự đẳng cấp.', 1),
+(5, N'Burberry City Watch', N'burberry_city_watch.jpg', 7700000,  7, N'Burberry City Watch, phong cách thời thượng cho người yêu thành phố.', 1),
+(5, N'Burberry The Beat', N'burberry_the_beat.jpg', 8200000,  6, N'Burberry The Beat, sự lựa chọn hoàn hảo cho phong cách cá tính.', 1),
+(5, N'Burberry Black Label', N'burberry_black_label.jpg', 9500000,  4, N'Burberry Black Label, đồng hồ cao cấp với thiết kế sang trọng.', 1),
+
+-- Đồng hồ Burberry dành cho nữ (id_subcategories = 15)
+
+(15, N'Burberry Elegant Heritage', N'burberry_elegant_heritage.jpg', 7500000, 10, N'Burberry Elegant Heritage, phong cách cổ điển đầy nữ tính.', 1),
+(15, N'Burberry Lady Classic', N'burberry_lady_classic.jpg', 8200000, 8, N'Burberry Lady Classic, thiết kế thanh lịch phù hợp với mọi sự kiện.', 1),
+(15, N'Burberry Check Style', N'burberry_check_style.jpg', 8800000, 6, N'Burberry Check Style, đồng hồ với họa tiết Check mang tính biểu tượng.', 1),
+(15, N'Burberry Slim Chic', N'burberry_slim_chic.jpg', 8600000, 7, N'Burberry Slim Chic, thiết kế mỏng nhẹ và sang trọng.', 1),
+(15, N'Burberry Pearl Swiss', N'burberry_pearl_swiss.jpg', 9200000,  4, N'Burberry Pearl Swiss, đồng hồ Thụy Sĩ cao cấp với chi tiết ngọc trai.', 1),
+(15, N'Burberry Feminine Rhythm', N'burberry_feminine_rhythm.jpg', 9700000, 3, N'Burberry Feminine Rhythm, phong cách hiện đại và trẻ trung.', 1),
+(15, N'Burberry Icon Grace', N'burberry_icon_grace.jpg', 10500000,  3, N'Burberry Icon Grace, đồng hồ đẳng cấp với thiết kế đặc trưng của thương hiệu.', 1),
+(15, N'Burberry Floral Charm', N'burberry_floral_charm.jpg', 7800000, 9, N'Burberry Floral Charm, sự kết hợp hoàn hảo giữa họa tiết hoa và phong cách.', 1),
+(15, N'Burberry Shine City', N'burberry_shine_city.jpg', 8700000,  6, N'Burberry Shine City, phong cách thời thượng dành cho quý cô thành phố.', 1),
+(15, N'Burberry Lady Black Label', N'burberry_lady_black_label.jpg', 9900000, 4, N'Burberry Lady Black Label, đồng hồ cao cấp với phong cách mạnh mẽ và nữ tính.', 1),
+
+-- Đồng hồ Orient dành cho nam (id_subcategories = 4)
+
+(4, N'Orient Sun and Moon', N'orient_sun_and_moon.jpg', 8500000,  10, N'Orient Sun and Moon, thiết kế cổ điển với mặt trời và mặt trăng.', 1),
+(4, N'Orient Mako II', N'orient_mako_ii.jpg', 5800000,  8, N'Orient Mako II, đồng hồ lặn mạnh mẽ và thể thao.', 1),
+(4, N'Orient Bambino', N'orient_bambino.jpg', 6200000,  7, N'Orient Bambino, biểu tượng của sự thanh lịch và tinh tế.', 1),
+(4, N'Orient Ray II', N'orient_ray_ii.jpg', 5600000,  9, N'Orient Ray II, thiết kế mạnh mẽ và phong cách.', 1),
+(4, N'Orient Star', N'orient_star.jpg', 12000000,  5, N'Orient Star, đồng hồ cơ cao cấp cho quý ông.', 1),
+(4, N'Orient Defender', N'orient_defender.jpg', 7000000, 6, N'Orient Defender, sự lựa chọn hoàn hảo cho người yêu thích phiêu lưu.', 1),
+(4, N'Orient Symphony', N'orient_symphony.jpg', 5200000,  10, N'Orient Symphony, thiết kế cổ điển và thanh lịch.', 1),
+(4, N'Orient Kamasu', N'orient_kamasu.jpg', 6500000, 8, N'Orient Kamasu, đồng hồ lặn với độ bền cao.', 1),
+(4, N'Orient Contemporary', N'orient_contemporary.jpg', 4900000,  12, N'Orient Contemporary, phong cách hiện đại và tối giản.', 1),
+(4, N'Orient Multi-Year Calendar', N'orient_multi_year_calendar.jpg', 8000000,  7, N'Orient Multi-Year Calendar, tích hợp chức năng lịch đa năm.', 1),
+
+-- Đồng hồ Orient dành cho nữ (id_subcategories = 14)
+(14, N'Orient Lady Classic', N'orient_lady_classic_(2).jpg', 5200000,  10, N'Orient Lady Classic, phong cách thanh lịch cho quý cô.', 1),
+(14, N'Orient Symphony', N'orient_symphony.jpg', 5400000,  8, N'Orient Symphony, sự kết hợp hoàn hảo giữa cổ điển và hiện đại.', 1),
+(14, N'Orient Crystal', N'orient_crystal.jpg', 6200000,  7, N'Orient Crystal, thiết kế nữ tính với mặt kính pha lê.', 1),
+(14, N'Orient Charlene', N'orient_charlene.jpg', 5000000,  6, N'Orient Charlene, vẻ đẹp thanh tao và trang nhã.', 1),
+(14, N'Orient Pearl', N'orient_pearl.jpg', 5800000, 8, N'Orient Pearl, thiết kế ngọc trai nổi bật.', 1),
+(14, N'Orient Lady Star', N'orient_lady_star.jpg', 7500000,  5, N'Orient Lady Star, đồng hồ cơ cao cấp dành cho quý cô.', 1),
+(14, N'Orient Petite Elegance', N'orient_petite_elegance.jpg', 5200000,  9, N'Orient Petite Elegance, thiết kế tinh tế và thanh lịch.', 1),
+(14, N'Orient Sunlight', N'orient_sunlight.jpg', 5900000,  8, N'Orient Sunlight, phong cách tỏa sáng với mặt đồng hồ độc đáo.', 1),
+(14, N'Orient Aurora', N'orient_aurora.jpg', 6600000,  6, N'Orient Aurora, thiết kế hiện đại và quý phái.', 1),
+(14, N'Orient Rose Gold', N'orient_rose_gold.jpg', 7000000,  5, N'Orient Rose Gold, đồng hồ màu vàng hồng thời thượng.', 1),
+
+-- Đồng hồ Daniel Wellington dành cho nam (id_subcategories = 9)
+(9, N'DW Classic Black Sheffield', N'dw_classic_black_sheffield.jpg', 5000000,  10, N'DW Classic Black Sheffield, phong cách tối giản và thanh lịch.', 1),
+(9, N'DW Classic St Mawes', N'dw_classic_st_mawes.jpg', 4800000,  8, N'DW Classic St Mawes, thiết kế vượt thời gian với dây da nâu.', 1),
+(9, N'DW Dapper Bristol', N'dw_dapper_bristol.jpg', 6000000,  6, N'DW Dapper Bristol, sự lựa chọn hoàn hảo cho quý ông lịch lãm.', 1),
+(9, N'DW Classic Cambridge', N'dw_classic_cambridge.jpg', 4500000, 7, N'DW Classic Cambridge, thiết kế trẻ trung với dây NATO.', 1),
+(9, N'DW Iconic Link', N'dw_iconic_link.jpg', 7000000, 5, N'DW Iconic Link, đồng hồ dây kim loại mạnh mẽ.', 1),
+(9, N'DW Classic Cornwall', N'dw_classic_cornwall.jpg', 4700000,  9, N'DW Classic Cornwall, phong cách năng động với dây vải.', 1),
+(9, N'DW Petite Ashfield', N'dw_petite_ashfield.jpg', 4900000, 8, N'DW Petite Ashfield, thiết kế thanh lịch và hiện đại.', 1),
+(9, N'DW Dapper York', N'dw_dapper_york.jpg', 6200000,  6, N'DW Dapper York, sự kết hợp giữa cổ điển và hiện đại.', 1),
+(9, N'DW Classic Durham', N'dw_classic_durham.jpg', 5500000,  9, N'DW Classic Durham, thiết kế dây da cổ điển.', 1),
+(9, N'DW Iconic Link Lumine', N'dw_iconic_link_lumine.jpg', 8500000,  4, N'DW Iconic Link Lumine, đồng hồ dây kim loại sáng bóng.', 1),
+
+-- Đồng hồ Daniel Wellington dành cho nữ (id_subcategories = 19)
+(19, N'DW Elan Lumine Malachite Rose Gold', N'DW_Elan_Lumine_Malachite_Rose_Gold.png', 5200000, 10, N'Đồng Hồ DW Elan Lumine Malachite Rose Gold – DW00100721 thuộc BST DW Elan Lumine Gold xoá bỏ ranh giới giữa kỹ nghệ chế tác đồng hồ truyền thống với trang sức thời trang quyến rũ.', 1),
+(19, N'DW Elan Lumine Rose Gold', N'DW_Elan_Lumine_Rose_Gold.png', 5400000,  8, N'DW Elan Lumine Rose Gold, sự kết hợp hoàn hảo giữa cổ điển và hiện đại.', 1),
+(19, N'DW Elan Lumine Silver', N'DW-Elan-Lumine-Silver.png', 6200000,  7, N'Mẫu Đồng Hồ DW Elan Lumine Silver – DW00100716 mang vẻ đẹp giản dị và tinh tế, thể hiện tâm tư của người phụ nữ hiện đại qua từng đường nét chế tác. Bộ sưu tập Daniel Wellington Elan Lumine với thiết kế dây mắt xích nhỏ độc đáo, là lời nhắn gửi đầy ý nghĩa đến phái đẹp.', 1),
+(19, N'DW Elan Lumine Unitone Gold', N'DW-Elan-Lumine-Unitone-Gold.png', 5000000,  6, N'Đồng hồ DW Elan Lumine Unitone Gold – DW00100718 là một tác phẩm nghệ thuật từ thương hiệu đồng hồ danh tiếng Daniel Wellington.', 1),
+(19, N'DW Elan Lumine Unitone Rose Gold', N'DW-Elan-Lumine-Unitone-Rose-Gold.png', 5800000,  8, N'DW Elan Lumine Unitone Rose Gold, thiết kế nổi bật.', 1),
+(19, N'DW Elan Lumine Unitone Silver', N'DW-Elan-Lumine-Unitone-Silver.png', 7500000, 5, N'Mẫu Đồng Hồ DW Elan Lumine Unitone Silver – DW00100719 mang vẻ đẹp giản dị và tinh tế, thể hiện tâm tư của người phụ nữ hiện đại qua từng đường nét chế tác.', 1),
+(19, N'DW Iconic Link', N'DW-Iconic-Link.jpg', 5200000,9, N'DW Iconic Link, thiết kế tinh tế và thanh lịch.', 1),
+(19, N'DW Iconic Link Ceramic', N'DW-Iconic-Link-Ceramic.jpg', 5900000, 8, N'Đồng hồ DW Iconic Link Ceramic tự hào là mẫu đồng hồ đầu tiên Daniel Wellington sử dụng một chất liệu hoàn toàn mới.', 1),
+(19, N'DW Iconic Link Lumine', N'DW-Iconic-Link-Lumine.jpg', 6600000,  6, N'Đồng hồ DW Iconic Link Lumine được thiết kế độc quyền từ DW mang lại cho mười hai mặt số một sự đổi mới rực rỡ mà tinh tế.', 1),
+(19, N'DW Iconic Link Unitone', N'DW-Iconic-Link-Unitone.jpg', 7000000,  5, N'Đồng hồ DW Iconic Link Unitone trong bộ sưu tập Iconic Link sẽ là món phụ kiện tạo dựng điểm nhấn táo bạo và hòa hợp với mọi sắc tố trong phong cách của bạn.', 1);
+
+
+
+INSERT INTO orders (user_ID, address,phone,fullname) VALUES 
+('1',N'Hải Phòng',N'098564321',N'Nguyễn Văn Lộc'),
+('3',N'Hà Nội',N'098364321',N'Nguyễn Văn Minh'),
+ ('4',N'Hưng Yên',N'098364321',N'Nguyễn Văn Anh'),
+('5',N'Quy Nhơn',N'098643621',N'Nguyễn Văn Ân'),
+ ('6',N'TP. Hồ Chí Minh',N'098644321',N'Nguyễn Văn Lợi'),
+ ('3',N'Hà Nam',N'098643321',N'Nguyễn Văn Linh');
+
+INSERT INTO order_detail (order_ID, product_id, qty,price,order_date) VALUES ('1', '187', '2', '4.9e+006', '2025-01-01');
+INSERT INTO order_detail (order_ID, product_id, qty,price,order_date) VALUES ('2', '187', '1', '4.9e+006', '2024-12-31');
+INSERT INTO order_detail (order_ID, product_id, qty,price,order_date) VALUES ('3', '1', '1', '5e+006', '2024-12-12');
+INSERT INTO order_detail (order_ID, product_id, qty,price,order_date) VALUES ('4', '1', '1', '5e+006', '2025-02-02');
+INSERT INTO order_detail (order_ID, product_id, qty,price,order_date) VALUES ('5', '17', '1', '8.2e+006', '2025-01-20');
+INSERT INTO order_detail (order_ID, product_id, qty,price,order_date) VALUES ('5', '18', '1', '6.8e+006', '2025-02-01');
+INSERT INTO order_detail (order_ID, product_id, qty,price,order_date) VALUES ('6', '26', '1', '2e+006', '2024-12-29');
+
+
+
+INSERT INTO users (username, password, email, full_name, phone, address, role, status) VALUES
+(N'user1', N'MTIzNDU2', N'user1@gmail.com', N'Lại Văn Điệp', N'0123456790', N'Địa chỉ 1', 0, 1),
+(N'user2', N'MTIzNDU2', N'user2@gmail.com', N'Mã Thần', N'0123456791', N'Địa chỉ 2', 0, 1),
+(N'user3', N'MTIzNDU2', N'user3@gmail.com', N'Nguyễn Ánh Quỳnh', N'0123456792', N'Địa chỉ 3', 0, 1),
+(N'user4', N'MTIzNDU2', N'user4@gmail.com', N'Trần Lê Văn', N'0123456793', N'Địa chỉ 4', 0, 1);
+
+INSERT INTO orders (user_ID, address,phone,fullname) VALUES 
+(3,N'Quảng Ngãi',N'098534321',N'Nguyễn Văn Lộc'), -- tientm
+(4,N'Bắc Ninh',N'098564421',N'Nguyễn Văn Lợi'), -- lyntb
+(5,N'Nghệ An',N'098564321',N'Nguyễn Minh Anh'), -- nhihu
+(6,N'Hà Tĩnh',N'098564351',N'Nguyễn Minh Lý'), -- nhitty
+(7,N'QUảng Ninh',N'098554321',N'Nguyễn Minh Tuệ'), -- user1
+(8,N'Đắk Lắk',N'098564351',N'Nguyễn Minh Mẫn'), -- user2
+(9,N'Bình Dương',N'098574321',N'Nguyễn Minh Lộc'), -- user3
+(10,N'Bình Định',N'098584321',N'Nguyễn Văn Minh'),
+(9,N'Hưng Yên',N'098564321',N'Nguyễn Minh Tín'),
+(1,N'Hải Phòng',N'098566321',N'Nguyễn Văn Tín');
+-- Năm 2023
+-- Chi tiết đơn hàng cho tientm (order_id = 1)
+INSERT INTO order_detail (order_id, product_id, qty, price, order_date) VALUES
+(1, 1, 1, 5000000, '2023-10-26'),
+(1, 12, 1, 7500000, '2023-10-26'),
+(1, 23, 1, 1700000, '2023-10-26');
+
+-- Chi tiết đơn hàng cho lyntb (order_id = 2)
+INSERT INTO order_detail (order_id, product_id, qty, price, order_date) VALUES
+(2, 4, 1, 7200000, '2023-10-26'),
+(2, 15, 1, 6200000, '2023-10-26'),
+(2, 26, 1, 2000000, '2023-10-26');
+
+-- Chi tiết đơn hàng cho nhihu (order_id = 3)
+INSERT INTO order_detail (order_id, product_id, qty, price, order_date) VALUES
+(3, 7, 1, 9900000, '2023-10-26'),
+(3, 18, 1, 6800000, '2023-10-26'),
+(3, 29, 1, 2200000, '2023-10-26');
+
+-- Chi tiết đơn hàng cho nhitty (order_id = 4)
+INSERT INTO order_detail (order_id, product_id, qty, price, order_date) VALUES
+(4, 10, 1, 7600000, '2023-10-26'),
+(4, 21, 1, 2400000, '2023-10-26'),
+(4, 32, 1, 1500000, '2023-10-26');
+
+-- Chi tiết đơn hàng cho user1 (order_id = 5)
+INSERT INTO order_detail (order_id, product_id, qty, price, order_date) VALUES
+(5, 2, 1, 6500000, '2023-10-26'),
+(5, 13, 1, 8700000, '2023-10-26'),
+(5, 24, 1, 1800000, '2023-10-26');
+
+-- Chi tiết đơn hàng cho user2 (order_id = 6)
+INSERT INTO order_detail (order_id, product_id, qty, price, order_date) VALUES
+(6, 5, 1, 5500000, '2023-10-26'),
+(6, 16, 1, 7800000, '2023-10-26'),
+(6, 27, 1, 2100000, '2023-10-26');
+
+-- Chi tiết đơn hàng cho user3 (order_id = 7)
+INSERT INTO order_detail (order_id, product_id, qty, price, order_date) VALUES
+(7, 8, 1, 8200000, '2023-10-26'),
+(7, 19, 1, 8400000, '2023-10-26'),
+(7, 30, 1, 2300000, '2023-10-26');
+
+-- Chi tiết đơn hàng cho user4 (order_id = 8)
+INSERT INTO order_detail (order_id, product_id, qty, price, order_date) VALUES
+(8, 3, 1, 8500000, '2023-10-26'),
+(8, 14, 1, 7200000, '2023-10-26'),
+(8, 25, 1, 1900000, '2023-10-26');
+
+-- Năm 2024
+INSERT INTO orders (user_ID, address,phone,fullname) VALUES 
+(3,N'Hải Phòng',N'098564321',N'Nguyễn Văn Lộc'), -- tientm
+(4,N'Hàng Buồm',N'0985264321',N'Lê Văn Sỹ'), -- lyntb
+(5,N'Gia Lai',N'098564621',N'Lê Văn Lộc'), -- nhihu
+(6,N'Lào Cai',N'098564341',N'Lê Hội Minh'), -- nhitty
+(7,N'Hải Dương',N'098568321',N'Lê Minh'), -- user1
+(8,N'Quảng Bình',N'098544321',N'Trần Văn Minh'), -- user2
+(9,N'Huế',N'098564821',N'rần Văn Lộc'), -- user3
+(10,N'Quảng Trị',N'098764321',N'Trần Minh Ái'); -- user4
+-- Chi tiết đơn hàng cho tientm (order_id = 9)
+INSERT INTO order_detail (order_id, product_id, qty, price, order_date) VALUES
+(9, 33, 1, 1500000, '2024-01-15'),
+(9, 11, 1, 5200000, '2024-01-15'),
+(9, 6, 1, 7800000, '2024-01-15');
+
+-- Chi tiết đơn hàng cho lyntb (order_id = 10)
+INSERT INTO order_detail (order_id, product_id, qty, price, order_date) VALUES
+(10, 34, 1, 1600000, '2024-02-20'),
+(10, 17, 1, 8200000, '2024-02-20'),
+(10, 9, 1, 8800000, '2024-02-20');
+
+-- Chi tiết đơn hàng cho nhihu (order_id = 11)
+INSERT INTO order_detail (order_id, product_id, qty, price, order_date) VALUES
+(11, 35, 1, 1700000, '2024-03-10'),
+(11, 20, 1, 7900000, '2024-03-10'),
+(11, 1, 1, 5000000, '2024-03-10');
+
+-- Chi tiết đơn hàng cho nhitty (order_id = 12)
+INSERT INTO order_detail (order_id, product_id, qty, price, order_date) VALUES
+(12, 36, 1, 1800000, '2024-04-05'),
+(12, 21, 1, 2400000, '2024-04-05'),
+(12, 4, 1, 7200000, '2024-04-05');
+
+-- Chi tiết đơn hàng cho user1 (order_id = 13)
+INSERT INTO order_detail (order_id, product_id, qty, price, order_date) VALUES
+(13, 37, 1, 1900000, '2024-05-18'),
+(13, 12, 1, 7500000, '2024-05-18'),
+(13, 7, 1, 9900000, '2024-05-18');
+
+-- Chi tiết đơn hàng cho user2 (order_id = 14)
+INSERT INTO order_detail (order_id, product_id, qty, price, order_date) VALUES
+(14, 38, 1, 2000000, '2024-06-22'),
+(14, 15, 1, 6200000, '2024-06-22'),
+(14, 10, 1, 7600000, '2024-06-22');
+
+-- Chi tiết đơn hàng cho user3 (order_id = 15)
+INSERT INTO order_detail (order_id, product_id, qty, price, order_date) VALUES
+(15, 39, 1, 2100000, '2024-07-08'),
+(15, 18, 1, 6800000, '2024-07-08'),
+(15, 2, 1, 6500000, '2024-07-08');
+
+-- Chi tiết đơn hàng cho user4 (order_id = 16)
+INSERT INTO order_detail (order_id, product_id, qty, price, order_date) VALUES
+(16, 40, 1, 2200000, '2024-08-12'),
+(16, 21, 1, 2400000, '2024-08-12'),
+(16, 5, 1, 5500000, '2024-08-12');
+
+select *from sub_categories;
+select *from categories;
+select *from products;
+
+SELECT 
+    'INSERT INTO discount_details(discount_id, product_id, categories_id, subcategories_id, status) VALUES ('
+    + QUOTENAME(ISNULL(CAST(discount_id AS NVARCHAR), 'NULL'), '''') + ', '
+    + QUOTENAME(ISNULL(CAST(product_id AS NVARCHAR), 'NULL'), '''') + ', '
+    + QUOTENAME(ISNULL(CAST(categories_id AS NVARCHAR), 'NULL'), '''') + ', '
+    + QUOTENAME(ISNULL(CAST(subcategories_id AS NVARCHAR), 'NULL'), '''') + ', '
+    + QUOTENAME(ISNULL(CAST(status AS NVARCHAR), 'NULL'), '''') + ');'
+FROM discount_details;
+INSERT INTO discount_details(discount_id, product_id, categories_id, subcategories_id, status) VALUES ('1', '12', NULL, NULL, '1');
+INSERT INTO discount_details(discount_id, product_id, categories_id, subcategories_id, status) VALUES ('1', NULL, NULL, '1', '1');
+INSERT INTO discount_details(discount_id, product_id, categories_id, subcategories_id, status) VALUES ('3', '167', NULL, NULL, '1');
+INSERT INTO discount_details(discount_id, product_id, categories_id, subcategories_id, status) VALUES ('3', NULL, '1', NULL, '1');
+INSERT INTO discount_details(discount_id, product_id, categories_id, subcategories_id, status) VALUES ('3', NULL, '2', NULL, '1');
+INSERT INTO discount_details(discount_id, product_id, categories_id, subcategories_id, status) VALUES ('3', NULL, '3', NULL, '1');
+INSERT INTO discount_details(discount_id, product_id, categories_id, subcategories_id, status) VALUES ('3', '157', NULL, NULL, '1');
+INSERT INTO discount_details(discount_id, product_id, categories_id, subcategories_id, status) VALUES ('3', '186', NULL, NULL, '1');
+INSERT INTO discount_details(discount_id, product_id, categories_id, subcategories_id, status) VALUES ('3', '146', NULL, NULL, '1');
+INSERT INTO discount_details(discount_id, product_id, categories_id, subcategories_id, status) VALUES ('3', NULL, NULL, '5', '1');
+INSERT INTO discount_details(discount_id, product_id, categories_id, subcategories_id, status) VALUES ('3', NULL, NULL, '17', '1');
+```
+
+SELECT 'insert into discounts(discount_value,discount_name,start_date,end_date,status) VALUES ('
+        + QUOTENAME(discount_value, '''') + ', '
+        + QUOTENAME(discount_name, '''') + ', '
+		 + QUOTENAME(start_date, '''') + ', '
+		  + QUOTENAME(end_date, '''') + ', '
+        + QUOTENAME(status, '''') + ');'
+FROM discounts;
+
+insert into discounts(discount_value,discount_name,start_date,end_date,status) VALUES ('20', 'Lễ 10-3', '2025-03-26', '2025-03-31', '1');
+insert into discounts(discount_value,discount_name,start_date,end_date,status) VALUES ('30', 'Lễ 30/4 - 1/5', '2025-04-28', '2025-05-01', '1');
+insert into discounts(discount_value,discount_name,start_date,end_date,status) VALUES ('10', 'Bất kì', '2025-03-26', '2025-03-27', '1');
+
+select * from users
