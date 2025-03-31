@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ProductServiceImpl1 implements ProductService {
+public class ProductServiceImpl implements ProductService {
 
     private final ProductDAO productDAO;
 
@@ -45,7 +45,7 @@ public class ProductServiceImpl1 implements ProductService {
     private SubCategoryService subCategoryService;
 
     @Autowired
-    public ProductServiceImpl1(ProductDAO productDAO) {
+    public ProductServiceImpl(ProductDAO productDAO) {
         this.productDAO = productDAO;
     }
 

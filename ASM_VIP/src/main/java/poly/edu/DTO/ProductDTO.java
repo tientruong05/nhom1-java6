@@ -3,6 +3,7 @@ package poly.edu.DTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import poly.edu.entity.SubCategoryEntity;
 
 @Data
 @NoArgsConstructor
@@ -19,4 +20,5 @@ public class ProductDTO {
     private int status; // 0: không hoạt động, 1: hoạt động
     private String description;
     private String subsetSubCategory;
+    private SubCategoryEntity subCategory;
 }
