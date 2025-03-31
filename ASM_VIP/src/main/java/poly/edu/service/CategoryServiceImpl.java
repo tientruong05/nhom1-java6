@@ -24,16 +24,14 @@ public class CategoryServiceImpl implements CategoryService {
     private ProductDAO productDAO;
 
     @Autowired
-    private CategoryDAO categoryDAO;
+    private CategoryDAO categoryDAO; // Sử dụng CategoryDAO thay vì CategoryRepository
 
     @Autowired
     private SubCategoryDAO subCategoryDAO;
 
     @Override
     public List<CategoryEntity> getCategoriesByStatus(int status) {
-        return categoryDAO.findByStatus(status).stream()
-                .filter(category -> category.getStatus() == status)
-                .collect(Collectors.toList());
+        return categoryDAO.findByStatus(status);
     }
 
     @Override
@@ -53,17 +51,23 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void createCategory(CategoryEntity category) {
-        Optional.ofNullable(category).ifPresent(categoryDAO::save);
+        if (category != null) {
+            categoryDAO.save(category);
+        }
     }
 
     @Override
     public void updateCategory(CategoryEntity category) {
-        Optional.ofNullable(category).ifPresent(categoryDAO::update);
+        if (category != null) {
+            categoryDAO.update(category);
+        }
     }
 
     @Override
     public void deleteCategory(int id) {
-        Optional.of(id).filter(i -> i > 0).ifPresent(categoryDAO::delete);
+        if (id > 0) {
+            categoryDAO.delete(id);
+        }
     }
 
     @Override

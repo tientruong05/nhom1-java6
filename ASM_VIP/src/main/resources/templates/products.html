@@ -46,7 +46,8 @@
 
         table {
             border-collapse: separate;
-            border-spacing: 0 8px;
+            border-spacing: 0 10px;
+            width: 100%;
         }
 
         table thead tr th {
@@ -105,6 +106,7 @@
         .modal-content {
             background: #222222;
             border: 1px solid #D4AF37;
+            border-radius: 10px;
         }
 
         .modal-header {
@@ -122,16 +124,50 @@
         .btn-close {
             color: #D4AF37;
             opacity: 1;
+            filter: invert(1);
         }
 
         .form-label {
             color: #D4AF37;
         }
 
+        table thead tr th:nth-child(1) { /* STT */
+            min-width: 50px;
+        }
+        table thead tr th:nth-child(2) { /* Tên sản phẩm */
+            min-width: 200px;
+        }
+        table thead tr th:nth-child(3) { /* Ảnh */
+            min-width: 80px;
+        }
+        table thead tr th:nth-child(4) { /* Loại hàng */
+            min-width: 120px;
+        }
+        table thead tr th:nth-child(5) { /* Hãng */
+            min-width: 120px;
+        }
+        table thead tr th:nth-child(6) { /* Giá */
+            min-width: 150px;
+        }
+        table thead tr th:nth-child(7) { /* Số lượng */
+            min-width: 100px;
+        }
+        table thead tr th:nth-child(8) { /* Mô tả */
+            min-width: 200px;
+        }
+        table thead tr th:nth-child(9) { /* Trạng thái */
+            min-width: 100px;
+        }
+        table thead tr th:nth-child(10) { /* Thao tác */
+            min-width: 100px;
+        }
+
         .form-control, .form-select {
             background: #111111;
             border: 1px solid #D4AF37;
             color: #fff;
+            height: 40px;
+            padding: 8px;
         }
 
         .form-control:focus, .form-select:focus {
@@ -150,38 +186,51 @@
             background: #2c2c2c;
             color: #D4AF37;
             border: 1px solid #D4AF37;
+            transition: all 0.3s ease;
+        }
+
+        .modal .btn-secondary:hover {
+            background: #3a3a3a;
+            transform: translateY(-1px);
         }
 
         .modal .btn-primary {
             background: #D4AF37;
             color: #111111;
             border: none;
+            transition: all 0.3s ease;
         }
 
-        .modal .btn-primary:hover, .modal .btn-secondary:hover {
-            opacity: 0.9;
+        .modal .btn-primary:hover {
+            background: #B4941E;
             transform: translateY(-1px);
         }
 
-        .btn-primary {
-            background: #D4AF37;
-            color: #111111;
+        .modal .btn-danger {
+            background: #dc3545;
+            color: #fff;
             border: none;
+            transition: all 0.3s ease;
         }
 
-        .btn-primary:hover {
-            background: #B4941E;
-            color: #111111;
+        .modal .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-1px);
         }
 
         .pagination {
             margin-top: 20px;
+            justify-content: center;
+            display: flex;
         }
 
         .page-link {
             background-color: #222222;
             color: #D4AF37;
             border: 1px solid rgba(212, 175, 55, 0.2);
+            margin: 0 2px;
+            padding: 6px 12px;
+            border-radius: 4px;
         }
 
         .page-link:hover {
@@ -198,6 +247,7 @@
         .page-item.disabled .page-link {
             background-color: #222222;
             color: rgba(212, 175, 55, 0.5);
+            pointer-events: none;
         }
 
         .search-filter-container {
@@ -208,7 +258,34 @@
             border: 1px solid rgba(212, 175, 55, 0.2);
         }
 
-        /* CSS cho thông báo */
+        .search-filter-container .row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-filter-container .col-lg-3,
+        .search-filter-container .col-lg-2 {
+            flex: 0 0 auto;
+            width: 200px;
+        }
+
+        .search-filter-container .btn-primary {
+            background: #D4AF37;
+            color: #111111;
+            border: none;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 0;
+        }
+
+        .search-filter-container .btn-primary:hover {
+            background: #B4941E;
+        }
+
         .alert {
             border-radius: 8px;
             padding: 12px 15px;
@@ -241,285 +318,444 @@
             filter: invert(1);
         }
 
+        .modal-body .delete-warning {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+        }
+
+        .modal-body .delete-warning i {
+            color: #dc3545;
+            font-size: 24px;
+        }
+
+        .modal-body .delete-warning strong {
+            color: #D4AF37;
+        }
+
+        .modal.fade .modal-dialog {
+            transition: transform 0.3s ease-out;
+            transform: translate(0, -50px);
+        }
+
+        .modal.show .modal-dialog {
+            transform: translate(0, 0);
+        }
+
         @media (max-width: 768px) {
             .alert {
                 max-width: 100%;
                 font-size: 0.85rem;
             }
+            .table-container {
+                padding: 15px;
+            }
+            .btn-success {
+                padding: 8px 15px;
+            }
+            .search-filter-container .col-lg-3,
+            .search-filter-container .col-lg-2 {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            .search-filter-container .row {
+                flex-direction: column;
+                gap: 0;
+            }
         }
     </style>
 </head>
 <body class="bg-light">
-  <div class="container py-5">
-      <div class="table-container">
-          <div class="d-flex justify-content-between align-items-center mb-4">
-              <h2>Quản lý sản phẩm</h2>
-              <!-- Thông báo -->
-              <div th:if="${success != null}" class="alert alert-success alert-dismissible fade show" role="alert">
-                  <i class="fas fa-check-circle"></i>
-                  <span th:text="${success}"></span>
-                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-              </div>
-              <div th:if="${error != null}" class="alert alert-danger alert-dismissible fade show" role="alert">
-                  <i class="fas fa-times-circle"></i>
-                  <span th:text="${error}"></span>
-                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-              </div>
-              <div class="d-flex gap-3">
-                  <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addProductModal">
-                      <i class="fas fa-plus me-2"></i>Thêm sản phẩm
-                  </button>
-              </div>
-          </div>
+    <div class="container py-5">
+        <div class="table-container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Quản lý sản phẩm</h2>
+                <div th:if="${param.success}" class="alert alert-success alert-dismissible fade show" role="alert" id="successAlert">
+                    <i class="fas fa-check-circle"></i>
+                    Thao tác thành công!
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show" role="alert" id="errorAlert">
+                    <i class="fas fa-times-circle"></i>
+                    <span th:text="${param.error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <div class="d-flex gap-3">
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                        <i class="fas fa-plus me-2"></i>Thêm sản phẩm
+                    </button>
+                </div>
+            </div>
 
-          <div class="search-filter-container mb-4">
-              <form th:action="@{/java5/asm/crud/products}" method="get" class="row g-3">
-                  <input type="hidden" name="page" value="0">
-                  <input type="hidden" name="size" th:value="${pageSize}">
-                  <div class="col-lg-3">
-                      <input type="text" class="form-control" name="search" th:value="${search}" placeholder="Tìm kiếm theo tên, loại hàng, hãng..." />
-                  </div>
-                  <div class="col-lg-2">
-                      <select class="form-select" name="categoryId">
-                          <option value="" th:selected="${categoryId == null}">Tất cả loại hàng</option>
-                          <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}" th:selected="${categoryId == cat.id}"></option>
-                      </select>
-                  </div>
-                  <div class="col-lg-2">
-                      <select class="form-select" name="subCategoryId">
-                          <option value="" th:selected="${subCategoryId == null}">Tất cả hãng</option>
-                          <option th:each="subcat : ${subcategories}" th:value="${subcat.id}" th:text="${subcat.subCategoriesName}" th:selected="${subCategoryId == subcat.id}"></option>
-                      </select>
-                  </div>
-                  <div class="col-lg-2">
-                      <select class="form-select" name="status">
-                          <option value="" th:selected="${status == null}">Tất cả trạng thái</option>
-                          <option value="1" th:selected="${status == '1'}">Hoạt động</option>
-                          <option value="0" th:selected="${status == '0'}">Khóa</option>
-                      </select>
-                  </div>
-                  <div class="col-lg-2">
-                      <button type="submit" class="btn btn-primary w-100">
-                          <i class="fas fa-filter me-2"></i>Lọc
-                      </button>
-                  </div>
-              </form>
-          </div>
+            <div class="search-filter-container mb-4">
+                <form th:action="@{/java5/asm/crud/products}" method="get" class="row g-3">
+                    <input type="hidden" name="page" value="0">
+                    <input type="hidden" name="size" th:value="${pageSize}">
+                    <div class="col-lg-3">
+                        <input type="text" class="form-control" name="search" th:value="${search}" placeholder="Tìm kiếm theo tên, loại hàng, hãng..." />
+                    </div>
+                    <div class="col-lg-2">
+                        <select class="form-select" name="categoryId" id="filterCategory" onchange="filterSubCategoriesForFilter()">
+                            <option value="" th:selected="${categoryId == null}">Tất cả loại hàng</option>
+                            <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}" th:selected="${categoryId == cat.id}"></option>
+                        </select>
+                    </div>
+                    <div class="col-lg-2">
+                        <select class="form-select" name="subCategoryId" id="filterSubCategory">
+                            <option value="" th:selected="${subCategoryId == null}">Tất cả hãng</option>
+                            <option th:each="subcat : ${subcategories}" th:value="${subcat.id}" th:text="${subcat.subCategoriesName}" th:data-category="${subcat.category.id}" th:selected="${subCategoryId == subcat.id}"></option>
+                        </select>
+                    </div>
+                    <div class="col-lg-2">
+                        <select class="form-select" name="status">
+                            <option value="" th:selected="${status == null}">Tất cả trạng thái</option>
+                            <option value="1" th:selected="${status == '1'}">Hoạt động</option>
+                            <option value="0" th:selected="${status == '0'}">Khóa</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-2">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-filter me-2"></i>Lọc
+                        </button>
+                    </div>
+                </form>
+            </div>
 
-          <table class="table">
-              <thead>
-                  <tr>
-                      <th>STT</th>
-                      <th>Tên sản phẩm</th>
-                      <th>Ảnh</th>
-                      <th>Loại hàng</th>
-                      <th>Hãng</th>
-                      <th>Giá</th>
-                     
-                      <th>Số lượng</th>
-                      <th>Mô tả</th>
-                      <th>Trạng thái</th>
-                      <th>Thao tác</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  <tr th:each="product : ${products}">
-                      <td th:text="${product.id}"></td>
-                      <td th:text="${product.name}"></td>
-                      <td>
-                          <img th:src="'/photos/' + ${product.image}" alt="Product Image" class="product-image" th:onerror="'this.src=\'/photos/default.png\''">
-                      </td>
-                      <td th:text="${product.subCategory.category.name}"></td>
-                      <td th:text="${product.subCategory.subCategoriesName}"></td>
-                      <td th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT') + 'VND'}"></td>
-                      
-                      <td th:text="${product.qty}"></td>
-                      <td th:text="${product.description}"></td>
-                      <td th:text="${product.status == 1 ? 'Hoạt động' : 'Khóa'}"></td>
-                      <td style="min-width: 80px;">
-                          <div class="d-flex gap-1">
-                              <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editProductModal" th:attr="data-id=${product.id}, data-name=${product.name}, data-category=${product.subCategory.category.id}, data-subcategory=${product.subCategory.id}, data-price=${product.price}, data-discount=${product.discount}, data-qty=${product.qty}, data-description=${product.description}, data-status=${product.status}, data-image=${product.image}">
-                                  <i class="fas fa-edit"></i>
-                              </button>
-                              <a th:href="@{/java5/asm/crud/products/delete/{id}(id=${product.id})}" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này?')">
-                                  <i class="fas fa-trash"></i>
-                              </a>
-                          </div>
-                      </td>
-                  </tr>
-              </tbody>
-          </table>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Ảnh</th>
+                        <th>Loại hàng</th>
+                        <th>Hãng</th>
+                        <th>Giá</th>
+                        <th>Số lượng</th>
+                        <th>Mô tả</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="product, iterStat : ${products}">
+                        <td th:text="${iterStat.count + (currentPage * pageSize)}"></td>
+                        <td th:text="${product.name}"></td>
+                        <td>
+                            <img th:src="@{'/photos/' + ${product.image}}" alt="Product Image" class="product-image" th:onerror="'this.src=\'/photos/default.png\''">
+                        </td>
+                        <td th:text="${product.subCategory?.category?.name} ?: 'N/A'"></td>
+                        <td th:text="${product.subCategory?.subCategoriesName} ?: 'N/A'"></td>
+                        <td>
+                            <span th:if="${product.discountPercentage != null}">
+                                <span th:text="${#numbers.formatDecimal(product.discountedPrice, 0, 'COMMA', 0, 'POINT') + ' VND'}"></span>
+                                <br/>
+                                <span style="text-decoration: line-through; color: #999;" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT') + ' VND'}"></span>
+                                <span style="color: #D4AF37;" th:text="' (' + ${product.discountPercentage} + '% OFF)'"></span>
+                            </span>
+                            <span th:unless="${product.discountPercentage != null}" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT') + ' VND'}"></span>
+                        </td>
+                        <td th:text="${product.qty}"></td>
+                        <td th:text="${product.description} ?: 'N/A'"></td>
+                        <td th:text="${product.status == 1 ? 'Hoạt động' : 'Khóa'}"></td>
+                        <td style="min-width: 80px;">
+                            <div class="d-flex gap-1">
+                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editProductModal" 
+                                        th:attr="data-id=${product.id}, 
+                                                data-name=${product.name}, 
+                                                data-category=${product.subCategory?.category?.id}, 
+                                                data-subcategory=${product.subCategory?.id}, 
+                                                data-price=${product.price}, 
+                                                data-qty=${product.qty}, 
+                                                data-description=${product.description}, 
+                                                data-status=${product.status}, 
+                                                data-image=${product.image}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"
+                                        th:attr="data-id=${product.id}, data-name=${product.name}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${products.isEmpty()}">
+                        <td colspan="10" style="text-align: center;">Không tìm thấy sản phẩm nào</td>
+                    </tr>
+                </tbody>
+            </table>
 
-          <!-- Phân trang -->
-          <nav aria-label="Page navigation" th:if="${totalPages > 1}">
-              <ul class="pagination justify-content-center">
-                  <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
-                      <a class="page-link" th:href="@{/java5/asm/crud/products(page=${currentPage - 1}, size=${pageSize}, search=${search}, categoryId=${categoryId}, subCategoryId=${subCategoryId}, status=${status})}">Trước</a>
-                  </li>
-                  <li class="page-item" th:each="i : ${#numbers.sequence(0, 2)}" th:if="${i < totalPages}" th:classappend="${currentPage == i} ? 'active'">
-                      <a class="page-link" th:href="@{/java5/asm/crud/products(page=${i}, size=${pageSize}, search=${search}, categoryId=${categoryId}, subCategoryId=${subCategoryId}, status=${status})}" th:text="${i + 1}"></a>
-                  </li>
-                  <li class="page-item" th:if="${totalPages > 6 and currentPage > 3}">
-                      <span class="page-link">...</span>
-                  </li>
-                  <li class="page-item" th:each="i : ${#numbers.sequence(currentPage - 1, currentPage + 1)}" th:if="${i >= 3 and i < totalPages - 3 and i >= 0}" th:classappend="${currentPage == i} ? 'active'">
-                      <a class="page-link" th:href="@{/java5/asm/crud/products(page=${i}, size=${pageSize}, search=${search}, categoryId=${categoryId}, subCategoryId=${subCategoryId}, status=${status})}" th:text="${i + 1}"></a>
-                  </li>
-                  <li class="page-item" th:if="${totalPages > 6 and currentPage < totalPages - 4}">
-                      <span class="page-link">...</span>
-                  </li>
-                  <li class="page-item" th:each="i : ${#numbers.sequence(totalPages - 3, totalPages - 1)}" th:if="${totalPages > 3 and i >= 3}" th:classappend="${currentPage == i} ? 'active'">
-                      <a class="page-link" th:href="@{/java5/asm/crud/products(page=${i}, size=${pageSize}, search=${search}, categoryId=${categoryId}, subCategoryId=${subCategoryId}, status=${status})}" th:text="${i + 1}"></a>
-                  </li>
-                  <li class="page-item" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
-                      <a class="page-link" th:href="@{/java5/asm/crud/products(page=${currentPage + 1}, size=${pageSize}, search=${search}, categoryId=${categoryId}, subCategoryId=${subCategoryId}, status=${status})}">Sau</a>
-                  </li>
-              </ul>
-          </nav>
+            <nav aria-label="Page navigation" th:if="${totalPages > 1}">
+                <ul class="pagination">
+                    <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+                        <a class="page-link" th:href="@{/java5/asm/crud/products(page=${currentPage - 1}, size=${pageSize}, search=${search}, categoryId=${categoryId}, subCategoryId=${subCategoryId}, status=${status})}">Trước</a>
+                    </li>
+                    <th:block th:each="i : ${#numbers.sequence(currentPage - 2 >= 0 ? currentPage - 2 : 0, currentPage + 2 < totalPages ? currentPage + 2 : totalPages - 1)}">
+                        <li class="page-item" th:classappend="${currentPage == i} ? 'active'">
+                            <a class="page-link" th:href="@{/java5/asm/crud/products(page=${i}, size=${pageSize}, search=${search}, categoryId=${categoryId}, subCategoryId=${subCategoryId}, status=${status})}" th:text="${i + 1}"></a>
+                        </li>
+                    </th:block>
+                    <li class="page-item" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
+                        <a class="page-link" th:href="@{/java5/asm/crud/products(page=${currentPage + 1}, size=${pageSize}, search=${search}, categoryId=${categoryId}, subCategoryId=${subCategoryId}, status=${status})}">Sau</a>
+                    </li>
+                </ul>
+            </nav>
 
-          <!-- Modal thêm sản phẩm -->
-          <div class="modal fade" id="addProductModal" tabindex="-1">
-              <div class="modal-dialog">
-                  <div class="modal-content">
-                      <div class="modal-header">
-                          <h5 class="modal-title">Thêm sản phẩm mới</h5>
-                          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                      </div>
-                      <div class="modal-body">
-                          <form th:action="@{/java5/asm/crud/products/save}" th:object="${product}" method="post" enctype="multipart/form-data" id="addForm">
-                              <div class="mb-3">
-                                  <label class="form-label">Tên sản phẩm</label>
-                                  <input type="text" th:field="*{name}" class="form-control" required>
-                              </div>
-                              <div class="mb-3">
-                                  <label class="form-label">Loại hàng</label>
-                                  <select th:field="*{subCategory.category.id}" class="form-select" required>
-                                      <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
-                                  </select>
-                              </div>
-                              <div class="mb-3">
-                                  <label class="form-label">Hãng</label>
-                                  <select th:field="*{subCategory.id}" class="form-select" required>
-                                      <option th:each="subcategory : ${subcategories}" th:value="${subcategory.id}" th:text="${subcategory.subCategoriesName}"></option>
-                                  </select>
-                              </div>
-                              <div class="mb-3">
-                                  <label class="form-label">Giá</label>
-                                  <input type="number" th:field="*{price}" class="form-control" min="0" required>
-                              </div>
-                              
-                              <div class="mb-3">
-                                  <label class="form-label">Số lượng</label>
-                                  <input type="number" th:field="*{qty}" class="form-control" min="0" required>
-                              </div>
-                              <div class="mb-3">
-                                  <label class="form-label">Mô tả</label>
-                                  <textarea th:field="*{description}" class="form-control"></textarea>
-                              </div>
-                              <div class="mb-3">
-                                  <label class="form-label">Trạng thái</label>
-                                  <select th:field="*{status}" class="form-select">
-                                      <option value="1">Hoạt động</option>
-                                      <option value="0">Khóa</option>
-                                  </select>
-                              </div>
-                              <div class="mb-3">
-                                  <label class="form-label">Ảnh</label>
-                                  <input type="file" name="imageFile" class="form-control">
-                              </div>
-                          </form>
-                      </div>
-                      <div class="modal-footer">
-                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                          <button type="submit" form="addForm" class="btn btn-primary">Lưu</button>
-                      </div>
-                  </div>
-              </div>
-          </div>
+            <!-- Modal thêm sản phẩm -->
+            <div class="modal fade" id="addProductModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Thêm sản phẩm mới</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form th:action="@{/java5/asm/crud/products/save}" method="post" enctype="multipart/form-data" id="addForm">
+                                <div class="mb-3">
+                                    <label class="form-label">Tên sản phẩm</label>
+                                    <input type="text" name="name" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Loại hàng</label>
+                                    <select name="category.id" class="form-select" required id="addCategory" onchange="filterSubCategories()">
+                                        <option value="" disabled selected>Chọn loại hàng</option>
+                                        <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Hãng</label>
+                                    <select name="subCategory.id" class="form-select" required id="addSubCategory">
+                                        <option value="" disabled selected>Chọn hãng</option>
+                                        <option th:each="subcat : ${subcategories}" th:value="${subcat.id}" th:text="${subcat.subCategoriesName}" th:data-category="${subcat.category.id}"></option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Giá</label>
+                                    <input type="number" name="price" class="form-control" min="0" step="1000" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Số lượng</label>
+                                    <input type="number" name="qty" class="form-control" min="0" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Mô tả</label>
+                                    <textarea name="description" class="form-control" rows="3"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Trạng thái</label>
+                                    <select name="status" class="form-select">
+                                        <option value="1">Hoạt động</option>
+                                        <option value="0">Khóa</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Ảnh</label>
+                                    <input type="file" name="imageFile" class="form-control" accept="image/*">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                    <button type="submit" class="btn btn-primary">Lưu</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-          <!-- Modal sửa sản phẩm -->
-          <div class="modal fade" id="editProductModal" tabindex="-1">
-              <div class="modal-dialog">
-                  <div class="modal-content">
-                      <div class="modal-header">
-                          <h5 class="modal-title">Sửa thông tin sản phẩm</h5>
-                          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                      </div>
-                      <div class="modal-body">
-                          <form th:action="@{/java5/asm/crud/products/save}" th:object="${product}" method="post" enctype="multipart/form-data" id="editForm">
-                              <input type="hidden" id="edit-product-id" name="id">
-                              <div class="mb-3">
-                                  <label class="form-label">Tên sản phẩm</label>
-                                  <input type="text" id="edit-product-name" name="name" class="form-control" required>
-                              </div>
-                              <div class="mb-3">
-                                  <label class="form-label">Loại hàng</label>
-                                  <select id="edit-product-category" name="categoryId" class="form-select" required>
-                                      <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
-                                  </select>
-                              </div>
-                              <div class="mb-3">
-                                  <label class="form-label">Hãng</label>
-                                  <select th:field="*{subCategory.id}" id="product-subcategory" class="form-select" required>
-                                      <option th:each="subcategory : ${subcategories}" th:value="${subcategory.id}" th:text="${subcategory.subCategoriesName}"></option>
-                                  </select>
-                              </div>
-                              <div class="mb-3">
-                                  <label class="form-label">Giá</label>
-                                  <input type="number" th:field="*{price}" id="edit-product-price" name="price" class="form-control" min="0" required>
-                              </div>
-                              
-                              <div class="mb-3">
-                                  <label class="form-label">Số lượng</label>
-                                  <input type="number" th:field="*{qty}" id="edit-product-qty" name="qty" class="form-control" min="0" required>
-                              </div>
-                              <div class="mb-3">
-                                  <label class="form-label">Mô tả</label>
-                                  <textarea id="edit-product-description" th:field="*{description}" name="description" class="form-control"></textarea>
-                              </div>
-                              <div class="mb-3">
-                                  <label class="form-label">Trạng thái</label>
-                                  <select id="edit-product-status" name="status" class="form-select">
-                                      <option value="1">Hoạt động</option>
-                                      <option value="0">Khóa</option>
-                                  </select>
-                              </div>
-                              <div class="mb-3">
-                                  <label class="form-label">Ảnh</label>
-                                  <input type="file" name="imageFile" class="form-control">
-                                  <p id="edit-original-image-name" class="mt-2 text-light" style="font-size: 0.9em;"></p>
-                              </div>
-                          </form>
-                      </div>
-                      <div class="modal-footer">
-                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                          <button type="submit" form="editForm" class="btn btn-primary">Cập nhật</button>
-                      </div>
-                  </div>
-              </div>
-          </div>
+            <!-- Modal sửa sản phẩm -->
+            <div class="modal fade" id="editProductModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Sửa thông tin sản phẩm</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form th:action="@{/java5/asm/crud/products/save}" method="post" enctype="multipart/form-data" id="editForm">
+                                <input type="hidden" id="edit-product-id" name="id">
+                                <div class="mb-3">
+                                    <label class="form-label">Tên sản phẩm</label>
+                                    <input type="text" id="edit-product-name" name="name" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Loại hàng</label>
+                                    <select name="category.id" class="form-select" required id="editCategory" onchange="filterSubCategoriesEdit()">
+                                        <option value="" disabled>Chọn loại hàng</option>
+                                        <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Hãng</label>
+                                    <select name="subCategory.id" class="form-select" required id="editSubCategory">
+                                        <option value="" disabled>Chọn hãng</option>
+                                        <option th:each="subcat : ${subcategories}" th:value="${subcat.id}" th:text="${subcat.subCategoriesName}" th:data-category="${subcat.category.id}"></option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Giá</label>
+                                    <input type="number" id="edit-product-price" name="price" class="form-control" min="0" step="1000" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Số lượng</label>
+                                    <input type="number" id="edit-product-qty" name="qty" class="form-control" min="0" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Mô tả</label>
+                                    <textarea id="edit-product-description" name="description" class="form-control" rows="3"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Trạng thái</label>
+                                    <select id="edit-product-status" name="status" class="form-select">
+                                        <option value="1">Hoạt động</option>
+                                        <option value="0">Khóa</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Ảnh hiện tại</label>
+                                    <div>
+                                        <img id="edit-product-image-preview" src="" alt="Current Image" class="product-image">
+                                        <input type="hidden" id="edit-product-image" name="image">
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Thay đổi ảnh</label>
+                                    <input type="file" name="imageFile" class="form-control" accept="image/*">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                    <button type="submit" class="btn btn-primary">Lưu</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-          <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-          <script>
-            document.addEventListener("DOMContentLoaded", function () {
-              // Xử lý modal sửa sản phẩm
-              document.getElementById("editProductModal").addEventListener("show.bs.modal", function (event) {
-                let button = event.relatedTarget;
-                document.getElementById('edit-product-id').value = button.getAttribute("data-id");
-                document.getElementById('edit-product-name').value = button.getAttribute("data-name");
-                document.getElementById('edit-product-category').value = button.getAttribute("data-category");
-                document.getElementById('product-subcategory').value = button.getAttribute("data-subcategory");
-                document.getElementById('edit-product-price').value = button.getAttribute("data-price");
-                document.getElementById('edit-product-discount').value = button.getAttribute("data-discount");
-                document.getElementById('edit-product-qty').value = button.getAttribute("data-qty");
-                document.getElementById('edit-product-description').value = button.getAttribute("data-description");
-                document.getElementById('edit-product-status').value = button.getAttribute("data-status");
-                let imageName = button.getAttribute("data-image");
-                document.getElementById('edit-original-image-name').textContent = "Ảnh hiện tại: " + imageName;
-              });
+            <!-- Modal xác nhận xóa -->
+            <div class="modal fade" id="deleteConfirmModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Xác nhận xóa sản phẩm</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="delete-warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <p>Bạn có chắc muốn xóa sản phẩm <strong id="delete-product-name"></strong> không? Hành động này không thể hoàn tác.</p>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <a id="delete-product-link" class="btn btn-danger">Xác nhận</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const editModal = document.getElementById('editProductModal');
+            editModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const id = button.getAttribute('data-id');
+                const name = button.getAttribute('data-name');
+                const category = button.getAttribute('data-category');
+                const subcategory = button.getAttribute('data-subcategory');
+                const price = button.getAttribute('data-price');
+                const qty = button.getAttribute('data-qty');
+                const description = button.getAttribute('data-description');
+                const status = button.getAttribute('data-status');
+                const image = button.getAttribute('data-image');
+
+                document.getElementById('edit-product-id').value = id;
+                document.getElementById('edit-product-name').value = name;
+                document.getElementById('editCategory').value = category || '';
+                filterSubCategoriesEdit();
+                document.getElementById('editSubCategory').value = subcategory || '';
+                document.getElementById('edit-product-price').value = price;
+                document.getElementById('edit-product-qty').value = qty;
+                document.getElementById('edit-product-description').value = description || '';
+                document.getElementById('edit-product-status').value = status;
+                document.getElementById('edit-product-image').value = image;
+                document.getElementById('edit-product-image-preview').src = image ? `/photos/${image}` : '/photos/default.png';
             });
-          </script>
-      </div>
-  </div>
+
+            const deleteModal = document.getElementById('deleteConfirmModal');
+            deleteModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const id = button.getAttribute('data-id');
+                const name = button.getAttribute('data-name');
+
+                document.getElementById('delete-product-name').textContent = name;
+                document.getElementById('delete-product-link').href = `/java5/asm/crud/products/delete/${id}`;
+            });
+
+            // Gọi hàm lọc khi trang tải để đảm bảo giá trị ban đầu
+            filterSubCategoriesForFilter();
+
+            // Tự động ẩn thông báo sau 5 giây (giống subcategories.html)
+            const successAlert = document.getElementById('successAlert');
+            const errorAlert = document.getElementById('errorAlert');
+
+            if (successAlert) {
+                setTimeout(() => {
+                    successAlert.style.display = 'none';
+                }, 5000);
+            }
+
+            if (errorAlert) {
+                setTimeout(() => {
+                    errorAlert.style.display = 'none';
+                }, 5000);
+            }
+        });
+
+        function filterSubCategories() {
+            const categoryId = document.getElementById('addCategory').value;
+            const subCategorySelect = document.getElementById('addSubCategory');
+            const options = subCategorySelect.querySelectorAll('option:not([value=""])');
+
+            options.forEach(option => {
+                const optionCategoryId = option.getAttribute('data-category');
+                option.style.display = (categoryId === '' || optionCategoryId === categoryId) ? '' : 'none';
+                if (option.style.display === 'none' && option.selected) {
+                    option.selected = false;
+                }
+            });
+        }
+
+        function filterSubCategoriesEdit() {
+            const categoryId = document.getElementById('editCategory').value;
+            const subCategorySelect = document.getElementById('editSubCategory');
+            const options = subCategorySelect.querySelectorAll('option:not([value=""])');
+
+            options.forEach(option => {
+                const optionCategoryId = option.getAttribute('data-category');
+                option.style.display = (categoryId === '' || optionCategoryId === categoryId) ? '' : 'none';
+                if (option.style.display === 'none' && option.selected) {
+                    option.selected = false;
+                }
+            });
+        }
+
+        // Hàm lọc cho thanh lọc
+        function filterSubCategoriesForFilter() {
+            const categoryId = document.getElementById('filterCategory').value;
+            const subCategorySelect = document.getElementById('filterSubCategory');
+            const options = subCategorySelect.querySelectorAll('option:not([value=""])');
+
+            options.forEach(option => {
+                const optionCategoryId = option.getAttribute('data-category');
+                option.style.display = (categoryId === '' || optionCategoryId === categoryId) ? '' : 'none';
+                if (option.style.display === 'none' && option.selected) {
+                    option.selected = false;
+                }
+            });
+        }
+    </script>
 </body>
 </html>

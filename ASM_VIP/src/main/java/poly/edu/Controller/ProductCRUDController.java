@@ -8,18 +8,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import poly.edu.DTO.ProductDTO;
 import poly.edu.entity.ProductEntity;
 import poly.edu.service.CategoryService;
 import poly.edu.service.ProductService;
 import poly.edu.service.SubCategoryService;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 @Controller
@@ -45,16 +41,13 @@ public class ProductCRUDController {
                                  @RequestParam(required = false) String status) {
         Pageable pageable = PageRequest.of(page, size);
 
-        Integer statusInt = null;
-        if (status != null && !status.isEmpty()) {
-            try {
-                statusInt = Integer.parseInt(status);
-            } catch (NumberFormatException e) {
-                statusInt = null;
-            }
-        }
+        // Sửa lỗi lambda: Xử lý status thành Integer một cách rõ ràng
+        Integer statusInt = status != null && !status.isEmpty() ? Integer.parseInt(status) : null;
 
-        Page<ProductDTO> productPage = productService.getFilteredProducts(search, categoryId, subCategoryId, statusInt, pageable);
+        Page<ProductDTO> productPage = productService.getFilteredProducts(
+                search, categoryId, subCategoryId, statusInt, pageable
+        );
+
         model.addAttribute("products", productPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", productPage.getTotalPages());
@@ -67,59 +60,34 @@ public class ProductCRUDController {
         model.addAttribute("product", new ProductEntity());
         model.addAttribute("categories", categoryService.getAllCategories());
         model.addAttribute("subcategories", subCategoryService.getAllSubCategories());
+
         return "products";
     }
 
-    @GetMapping("/add")
-    public String showAddForm(Model model) {
-        model.addAttribute("product", new ProductEntity());
-        model.addAttribute("subcategories", subCategoryService.getAllSubCategories());
-        model.addAttribute("categories", categoryService.getAllCategories());
-        return "product-modal-content";
-    }
-
     @PostMapping("/save")
-    public String saveProduct(@ModelAttribute ProductEntity product,
+    public String saveProduct(@RequestParam("name") String name,
+                              @RequestParam("category.id") Integer categoryId,
+                              @RequestParam("subCategory.id") Integer subCategoryId,
+                              @RequestParam("price") String priceStr,
+                              @RequestParam("qty") Integer qty,
+                              @RequestParam(value = "description", required = false) String description,
                               @RequestParam(value = "status", required = false) String status,
                               @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
-                              Model model) throws IOException {
-        product.setStatus(Optional.ofNullable(status)
-                .map(s -> s.equals("1") ? 1 : 0)
-                .orElse(0));
-
-        Optional.ofNullable(imageFile)
-                .filter(file -> !file.isEmpty())
-                .ifPresent(file -> {
-                    String originalFileName = file.getOriginalFilename();
-                    Path targetPath = Paths.get("C:/watch-store/photos", originalFileName);
-                    try {
-                        Files.createDirectories(targetPath.getParent());
-                        if (Files.exists(targetPath)) {
-                            try {
-                                Files.deleteIfExists(targetPath);
-                            } catch (IOException e) {
-                                String newFileName = System.currentTimeMillis() + "_" + originalFileName;
-                                targetPath = Paths.get("C:/watch-store/photos", newFileName);
-                            }
-                        }
-                        Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
-                        product.setImage(targetPath.getFileName().toString());
-                    } catch (IOException e) {
-                        throw new RuntimeException("Không thể lưu ảnh.", e);
-                    }
-                });
-
-        if (product.getId() == 0 && (product.getImage() == null || product.getImage().isEmpty())) {
-            product.setImage("default.png");
+                              @RequestParam(value = "id", defaultValue = "0") Integer id,
+                              @RequestParam(value = "image", required = false) String existingImage) {
+        String error = productService.saveProductFromForm(name, categoryId, subCategoryId, priceStr, qty, description, status, imageFile, id, existingImage);
+        if (error != null) {
+            return "redirect:/java5/asm/crud/products?error=" + URLEncoder.encode(error, StandardCharsets.UTF_8);
         }
-
-        productService.saveProduct(product);
-        return "redirect:/java5/asm/crud/products";
+        return "redirect:/java5/asm/crud/products?success=" + URLEncoder.encode("Lưu sản phẩm thành công", StandardCharsets.UTF_8);
     }
 
     @GetMapping("/delete/{id}")
     public String deleteProduct(@PathVariable int id) {
-        productService.deleteProduct(id);
-        return "redirect:/java5/asm/crud/products";
+        String error = productService.deleteProductById(id);
+        if (error != null) {
+            return "redirect:/java5/asm/crud/products?error=" + URLEncoder.encode(error, StandardCharsets.UTF_8);
+        }
+        return "redirect:/java5/asm/crud/products?success=" + URLEncoder.encode("Xóa sản phẩm thành công", StandardCharsets.UTF_8);
     }
 }
