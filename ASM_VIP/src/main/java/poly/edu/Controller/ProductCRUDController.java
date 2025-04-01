@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import poly.edu.DTO.ProductDTO;
 import poly.edu.entity.ProductEntity;
 import poly.edu.service.CategoryService;
@@ -41,12 +42,16 @@ public class ProductCRUDController {
                                  @RequestParam(required = false) String status) {
         Pageable pageable = PageRequest.of(page, size);
 
-        // Sửa lỗi lambda: Xử lý status thành Integer một cách rõ ràng
-        Integer statusInt = status != null && !status.isEmpty() ? Integer.parseInt(status) : null;
+        Integer statusInt = null;
+        if (status != null && !status.isEmpty()) {
+            try {
+                statusInt = Integer.parseInt(status);
+            } catch (NumberFormatException e) {
+                statusInt = null;
+            }
+        }
 
-        Page<ProductDTO> productPage = productService.getFilteredProducts(
-                search, categoryId, subCategoryId, statusInt, pageable
-        );
+        Page<ProductDTO> productPage = productService.getFilteredProducts(search, categoryId, subCategoryId, statusInt, pageable);
 
         model.addAttribute("products", productPage.getContent());
         model.addAttribute("currentPage", page);

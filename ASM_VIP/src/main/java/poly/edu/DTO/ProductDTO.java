@@ -13,12 +13,18 @@ public class ProductDTO {
     private String name;
     private String image;
     private float price;
-    private float discountedPrice;
+    private Float discountedPrice; // Giá sau giảm giá
     private Float discountPercentage;
     private int qty;
     private int sellProgress; // % tiến trình đã bán
     private int status; // 0: không hoạt động, 1: hoạt động
     private String description;
     private String subsetSubCategory;
-    private SubCategoryEntity subCategory;
+    private SubCategoryEntity subCategory; // Phần trăm giảm giá
+    private boolean isDiscounted; 
+
+    // Thêm phương thức setter cho isDiscounted
+    public void setDiscounted(boolean isDiscounted) {
+        this.isDiscounted = isDiscounted;
+    }
 }

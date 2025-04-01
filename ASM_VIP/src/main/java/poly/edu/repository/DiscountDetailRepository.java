@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import poly.edu.entity.DiscountDetailEntity;
+import poly.edu.entity.DiscountEntity;
 
 import java.util.List;
 
@@ -24,4 +25,7 @@ public interface DiscountDetailRepository extends JpaRepository<DiscountDetailEn
     
     @Query("SELECT dd FROM DiscountDetailEntity dd WHERE dd.subCategory.id = :subCategoryId AND dd.status = 1")
     List<DiscountDetailEntity> findBySubCategoryIdAndStatus(@Param("subCategoryId") int subCategoryId, @Param("status") int status);
+
+    List<DiscountDetailEntity> findByDiscount(DiscountEntity discount);
+    void deleteByDiscountId(int discountId);
 }
