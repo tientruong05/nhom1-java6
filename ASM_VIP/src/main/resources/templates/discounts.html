@@ -269,24 +269,29 @@
                                     <label class="form-label">Ngày kết thúc:</label>
                                     <input type="date" name="endDate" id="editEndDate" class="form-control" required />
                                 </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Giảm giá theo hãng:</label>
-                                    <select name="categoryIds" id="editCategories" class="form-select" multiple>
-                                        <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Giảm giá theo bộ sưu tập:</label>
-                                    <select name="subCategoryIds" id="editSubCategories" class="form-select" multiple>
-                                        <option th:each="subCategory : ${subCategories}" th:value="${subCategory.id}" th:text="${subCategory.subCategoriesName}"></option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Giảm giá theo sản phẩm:</label>
-                                    <select name="productIds" id="editProducts" class="form-select" multiple>
-                                        <option th:each="product : ${products}" th:value="${product.id}" th:text="${product.name}"></option>
-                                    </select>
-                                </div>
+                               
+								<div class="mb-3">
+									<label class="form-label">Giảm giá theo hãng:</label>
+								    <select name="categoryIds" class="form-select" required id="editCategory">
+								    <option value="" disabled>Chọn hãng</option>
+								    <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}" th:data-category="${category.name}"></option>
+								    </select>
+								</div>
+								<div class="mb-3">
+									<label class="form-label">Giảm giá theo bộ sưu tập:</label>
+								    <select name="subCategory.id" class="form-select" required id="editSubCategories">
+								    <option value="" disabled>Chọn bộ sưu tập</option>
+								    <option th:each="subCategory : ${subCategories}" th:value="${subCategory.id}" th:text="${subCategory.subCategoriesName}" th:data-category="${subCategory.subCategoriesName}"></option>
+								    </select>
+								</div>	
+								<div class="mb-3">
+									<label class="form-label">Giảm giá theo sản phẩm:</label>
+									<select name="productIds" class="form-select" required id="editProducts">
+									<option value="" disabled>Chọn sản phẩm</option>
+									<option th:each="product : ${products}" th:value="${product.id}" th:text="${product.name}" th:data-category="${product.name}"></option>
+									</select>
+								</div>														
+                                
                                 <div class="mb-3">
                                     <label class="form-label">Trạng thái:</label>
                                     <select name="status" id="editStatus" class="form-select">
@@ -330,7 +335,29 @@
                                     <label class="form-label">Ngày kết thúc:</label>
                                     <input type="date" name="endDate" class="form-control" required />
                                 </div>
-                                <div class="mb-3">
+								<div class="mb-3">
+									<label class="form-label">Giảm giá theo hãng:</label>
+								    <select name="categoryIds" class="form-select" required id="">
+								    <option value="" disabled>Chọn hãng</option>
+								    <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}" th:data-category="${category.name}"></option>
+								    </select>
+								</div>
+								<div class="mb-3">
+									<label class="form-label">Giảm giá theo bộ sưu tập:</label>
+								    <select name="subCategory.id" class="form-select" required id="">
+								    <option value="" disabled>Chọn bộ sưu tập</option>
+								    <option th:each="subCategory : ${subCategories}" th:value="${subCategory.id}" th:text="${subCategory.subCategoriesName}" th:data-category="${subCategory.subCategoriesName}"></option>
+								    </select>
+								</div>	
+								<div class="mb-3">
+									<label class="form-label">Giảm giá theo sản phẩm:</label>
+									<select name="productIds" class="form-select" required id="">
+									<option value="" disabled>Chọn sản phẩm</option>
+									<option th:each="product : ${products}" th:value="${product.id}" th:text="${product.name}" th:data-category="${product.name}"></option>
+									</select>
+								</div>														
+
+                                <!--<div class="mb-3">
                                     <label class="form-label">Giảm giá theo hãng:</label>
                                     <select name="categoryIds" class="form-select" multiple>
                                         <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
@@ -347,7 +374,7 @@
                                     <select name="productIds" class="form-select" multiple>
                                         <option th:each="product : ${products}" th:value="${product.id}" th:text="${product.name}"></option>
                                     </select>
-                                </div>
+                                </div>-->
                                 <div class="mb-3">
                                     <label class="form-label">Trạng thái:</label>
                                     <select name="status" class="form-select">
