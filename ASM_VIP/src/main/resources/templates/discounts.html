@@ -5,227 +5,447 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản Lý Giảm Giá</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-	<style>
-		
-	</style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        body {
+            background: #111111;
+            color: #D4AF37;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        .table-container {
+            background: #222222;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(212, 175, 55, 0.15);
+            padding: 30px;
+            margin-top: 20px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .table-container h1, .table-container h2 {
+            color: #D4AF37;
+            font-weight: 300;
+            letter-spacing: 1px;
+            margin-bottom: 30px;
+        }
+
+        .btn-success {
+            background: #D4AF37;
+            color: #111111;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 5px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-success:hover {
+            background: #B4941E;
+            color: #111111;
+            transform: translateY(-2px);
+        }
+
+        table {
+            border-collapse: separate;
+            border-spacing: 0 10px;
+            width: 100%;
+        }
+
+        table thead tr th {
+            background-color: #111111 !important;
+            color: #D4AF37 !important;
+            text-align: center;
+            border: none !important;
+            padding: 15px;
+            font-weight: 400;
+            letter-spacing: 1px;
+        }
+
+        tbody tr {
+            background: rgba(212, 175, 55, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        tbody tr:hover {
+            background: rgba(212, 175, 55, 0.1);
+            transform: scale(1.01);
+        }
+
+        tbody td {
+            border: none !important;
+            color: #fff;
+            padding: 15px;
+            vertical-align: middle;
+        }
+
+        .btn-warning {
+            background: #D4AF37;
+            color: #111111;
+            border: none;
+            margin-right: 5px;
+        }
+
+        .btn-danger {
+            background: #2c2c2c;
+            color: #D4AF37;
+            border: 1px solid #D4AF37;
+        }
+
+        .btn-warning:hover, .btn-danger:hover {
+            opacity: 0.8;
+            transform: translateY(-1px);
+        }
+
+        .modal-content {
+            background: #222222;
+            border: 1px solid #D4AF37;
+            border-radius: 10px;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .modal-footer {
+            border-top: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .modal-title {
+            color: #D4AF37;
+        }
+
+        .btn-close {
+            color: #D4AF37;
+            opacity: 1;
+            filter: invert(1);
+        }
+
+        .form-label {
+            color: #D4AF37;
+        }
+
+        table thead tr th:nth-child(1) { /* ID */
+            min-width: 50px;
+        }
+        table thead tr th:nth-child(2) { /* Tên giảm giá */
+            min-width: 200px;
+        }
+        table thead tr th:nth-child(3) { /* Giá trị giảm giá */
+            min-width: 150px;
+        }
+        table thead tr th:nth-child(4) { /* Ngày bắt đầu */
+            min-width: 120px;
+        }
+        table thead tr th:nth-child(5) { /* Ngày kết thúc */
+            min-width: 120px;
+        }
+        table thead tr th:nth-child(6) { /* Hành động */
+            min-width: 100px;
+        }
+
+        .form-control, .form-select {
+            background: #111111;
+            border: 1px solid #D4AF37;
+            color: #fff;
+            height: 40px;
+            padding: 8px;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background: #111111;
+            border-color: #B4941E;
+            box-shadow: 0 0 0 0.25rem rgba(212, 175, 55, 0.25);
+            color: #fff;
+        }
+
+        .form-select option {
+            background: #111111;
+            color: #fff;
+        }
+
+        .modal .btn-secondary {
+            background: #2c2c2c;
+            color: #D4AF37;
+            border: 1px solid #D4AF37;
+            transition: all 0.3s ease;
+        }
+
+        .modal .btn-secondary:hover {
+            background: #3a3a3a;
+            transform: translateY(-1px);
+        }
+
+        .modal .btn-primary {
+            background: #D4AF37;
+            color: #111111;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .modal .btn-primary:hover {
+            background: #B4941E;
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 768px) {
+            .table-container {
+                padding: 15px;
+            }
+            .btn-success {
+                padding: 8px 15px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Quản lý giảm giá</h1>
+    <div class="container py-5">
+        <div class="table-container">
+            <h1>Quản lý giảm giá</h1>
 
-    <h2>Tạo giảm giá mới</h2>
-    <button type="button" data-bs-toggle="modal" data-bs-target="#addDiscountModal">Thêm giảm giá</button>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Tạo giảm giá mới</h2>
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addDiscountModal">
+                    <i class="fas fa-plus me-2"></i>Thêm giảm giá
+                </button>
+            </div>
 
-    <h2>Danh sách giảm giá</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Tên giảm giá</th>
-                <th>Giá trị giảm giá (%)</th>
-                <th>Ngày bắt đầu</th>
-                <th>Ngày kết thúc</th>
-                <th>Hành động</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="discount : ${discounts}">
-                <td th:text="${discount.id}"></td>
-                <td th:text="${discount.discountName}"></td>
-                <td th:text="${discount.discountValue}"></td>
-                <td th:text="${#dates.format(discount.startDate, 'dd/MM/yyyy')}"></td>
-                <td th:text="${#dates.format(discount.endDate, 'dd/MM/yyyy')}"></td>
-                <td>
-                    <button type="button" class="edit-btn" th:data-id="${discount.id}">Sửa</button>
-					<a th:href="@{/discounts/delete/{id}(id=${discount.id})}" 
-					                               class="btn btn-danger btn-sm" 
-					                               onclick="return confirm('Bạn có chắc chắn muốn xóa?');">
-					                               <i class="fas fa-trash"></i>
-					                            </a>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+            <h2>Danh sách giảm giá</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tên giảm giá</th>
+                        <th>Giá trị giảm giá (%)</th>
+                        <th>Ngày bắt đầu</th>
+                        <th>Ngày kết thúc</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="discount : ${discounts}">
+                        <td th:text="${discount.id}"></td>
+                        <td th:text="${discount.discountName}"></td>
+                        <td th:text="${discount.discountValue}"></td>
+                        <td th:text="${#dates.format(discount.startDate, 'dd/MM/yyyy')}"></td>
+                        <td th:text="${#dates.format(discount.endDate, 'dd/MM/yyyy')}"></td>
+                        <td>
+                            <button type="button" class="btn btn-warning btn-sm edit-btn" th:data-id="${discount.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <a th:href="@{/discounts/delete/{id}(id=${discount.id})}" 
+                               class="btn btn-danger btn-sm" 
+                               onclick="return confirm('Bạn có chắc chắn muốn xóa?');">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
 
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <span class="close" id="closeEditModal">&times;</span>
-            <h2>Sửa giảm giá</h2>
-            <form id="editForm" method="post">
-                <input type="hidden" name="id" id="editId" />
-                <label>Tên giảm giá:</label>
-                <input type="text" name="discountName" id="editDiscountName" required /><br />
-                <label>Giá trị giảm giá (%):</label>
-                <input type="number" name="discountValue" id="editDiscountValue" required /><br />
-                <label>Ngày bắt đầu:</label>
-                <input type="date" name="startDate" id="editStartDate" required /><br />
-                <label>Ngày kết thúc:</label>
-                <input type="date" name="endDate" id="editEndDate" required /><br />
-                <label>Giảm giá theo hãng:</label><br />
-                <select name="categoryIds" id="editCategories" multiple>
-                    <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
-                </select><br />
-                <label>Giảm giá theo bộ sưu tập:</label><br />
-                <select name="subCategoryIds" id="editSubCategories" multiple>
-                    <option th:each="subCategory : ${subCategories}" th:value="${subCategory.id}" th:text="${subCategory.subCategoriesName}"></option>
-                </select><br />
-                <label>Giảm giá theo sản phẩm:</label><br />
-                <select name="productIds" id="editProducts" multiple>
-                    <option th:each="product : ${products}" th:value="${product.id}" th:text="${product.name}"></option>
-                </select><br />
-                <label>Trạng thái:</label><br />
-                <select name="status" id="editStatus">
-                    <option value="1">Hoạt động</option>
-                    <option value="0">Không hoạt động</option>
-                </select><br />
-                <button type="submit">Lưu</button>
-            </form>
-        </div>
-    </div>
+            <!-- Edit Modal -->
+            <div id="editModal" class="modal fade" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Sửa giảm giá</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="editForm" method="post">
+                                <input type="hidden" name="id" id="editId" />
+                                <div class="mb-3">
+                                    <label class="form-label">Tên giảm giá:</label>
+                                    <input type="text" name="discountName" id="editDiscountName" class="form-control" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Giá trị giảm giá (%):</label>
+                                    <input type="number" name="discountValue" id="editDiscountValue" class="form-control" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Ngày bắt đầu:</label>
+                                    <input type="date" name="startDate" id="editStartDate" class="form-control" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Ngày kết thúc:</label>
+                                    <input type="date" name="endDate" id="editEndDate" class="form-control" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Giảm giá theo hãng:</label>
+                                    <select name="categoryIds" id="editCategories" class="form-select" multiple>
+                                        <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Giảm giá theo bộ sưu tập:</label>
+                                    <select name="subCategoryIds" id="editSubCategories" class="form-select" multiple>
+                                        <option th:each="subCategory : ${subCategories}" th:value="${subCategory.id}" th:text="${subCategory.subCategoriesName}"></option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Giảm giá theo sản phẩm:</label>
+                                    <select name="productIds" id="editProducts" class="form-select" multiple>
+                                        <option th:each="product : ${products}" th:value="${product.id}" th:text="${product.name}"></option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Trạng thái:</label>
+                                    <select name="status" id="editStatus" class="form-select">
+                                        <option value="1">Hoạt động</option>
+                                        <option value="0">Không hoạt động</option>
+                                    </select>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                    <button type="submit" class="btn btn-primary">Lưu</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    <div id="addDiscountModal" class="modal">
-        <div class="modal-content">
-            <span class="close" data-bs-dismiss="modal">&times;</span>
-            <h2>Thêm giảm giá</h2>
-            <form action="/discounts/create" method="post">
-                <label>Tên giảm giá:</label>
-                <input type="text" name="discountName" required /><br />
-                <label>Giá trị giảm giá (%):</label>
-                <input type="number" name="discountValue" required /><br />
-                <label>Ngày bắt đầu:</label>
-                <input type="date" name="startDate" required /><br />
-                <label>Ngày kết thúc:</label>
-                <input type="date" name="endDate" required /><br />
-                <label>Giảm giá theo hãng:</label><br />
-                <select name="categoryIds" multiple>
-                    <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
-                </select><br />
-                <label>Giảm giá theo bộ sưu tập:</label><br />
-                <select name="subCategoryIds" multiple>
-                    <option th:each="subCategory : ${subCategories}" th:value="${subCategory.id}" th:text="${subCategory.subCategoriesName}"></option>
-                </select><br />
-                <label>Giảm giá theo sản phẩm:</label><br />
-                <select name="productIds" multiple>
-                    <option th:each="product : ${products}" th:value="${product.id}" th:text="${product.name}"></option>
-                </select><br />
-                <label>Trạng thái:</label><br />
-                <select name="status">
-                    <option value="1">Hoạt động</option>
-                    <option value="0">Không hoạt động</option>
-                </select><br />
-                <button type="submit">Tạo</button>
-            </form>
+            <!-- Add Discount Modal -->
+            <div id="addDiscountModal" class="modal fade" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Thêm giảm giá</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="/discounts/create" method="post">
+                                <div class="mb-3">
+                                    <label class="form-label">Tên giảm giá:</label>
+                                    <input type="text" name="discountName" class="form-control" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Giá trị giảm giá (%):</label>
+                                    <input type="number" name="discountValue" class="form-control" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Ngày bắt đầu:</label>
+                                    <input type="date" name="startDate" class="form-control" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Ngày kết thúc:</label>
+                                    <input type="date" name="endDate" class="form-control" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Giảm giá theo hãng:</label>
+                                    <select name="categoryIds" class="form-select" multiple>
+                                        <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Giảm giá theo bộ sưu tập:</label>
+                                    <select name="subCategoryIds" class="form-select" multiple>
+                                        <option th:each="subCategory : ${subCategories}" th:value="${subCategory.id}" th:text="${subCategory.subCategoriesName}"></option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Giảm giá theo sản phẩm:</label>
+                                    <select name="productIds" class="form-select" multiple>
+                                        <option th:each="product : ${products}" th:value="${product.id}" th:text="${product.name}"></option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Trạng thái:</label>
+                                    <select name="status" class="form-select">
+                                        <option value="1">Hoạt động</option>
+                                        <option value="0">Không hoạt động</option>
+                                    </select>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                    <button type="submit" class="btn btn-primary">Tạo</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-		var editModal = document.getElementById("editModal");
-		var closeEditModal = document.getElementById("closeEditModal");
+        var editModal = document.getElementById("editModal");
 
-		document.querySelectorAll('.edit-btn').forEach(button => {
-		    button.addEventListener('click', function() {
-		        var id = this.getAttribute('data-id');
-		        fetch('/discounts/edit/' + id)
-		            .then(response => response.json())
-		            .then(data => {
-		                // Kiểm tra null trước khi truy cập các phần tử DOM
-		                if (document.getElementById('editId')) {
-		                    document.getElementById('editId').value = data.discount.id;
-		                }
-		                if (document.getElementById('editDiscountName')) {
-		                    document.getElementById('editDiscountName').value = data.discount.discountName;
-		                }
-		                if (document.getElementById('editDiscountValue')) {
-		                    document.getElementById('editDiscountValue').value = data.discount.discountValue;
-		                }
-		                if (document.getElementById('editStartDate')) {
-		                    // Xử lý ngày tháng an toàn hơn
-		                    if (data.discount.startDate) {
-		                        document.getElementById('editStartDate').value = data.discount.startDate.substring(0, 10);
-		                    }
-		                }
-		                if (document.getElementById('editEndDate')) {
-		                    // Xử lý ngày tháng an toàn hơn
-		                    if (data.discount.endDate) {
-		                        document.getElementById('editEndDate').value = data.discount.endDate.substring(0, 10);
-		                    }
-		                }
-		                if (document.getElementById('editStatus')) {
-		                    document.getElementById('editStatus').value = data.discount.status;
-		                }
+        document.querySelectorAll('.edit-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                var id = this.getAttribute('data-id');
+                fetch('/discounts/edit/' + id)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (document.getElementById('editId')) {
+                            document.getElementById('editId').value = data.discount.id;
+                        }
+                        if (document.getElementById('editDiscountName')) {
+                            document.getElementById('editDiscountName').value = data.discount.discountName;
+                        }
+                        if (document.getElementById('editDiscountValue')) {
+                            document.getElementById('editDiscountValue').value = data.discount.discountValue;
+                        }
+                        if (document.getElementById('editStartDate')) {
+                            if (data.discount.startDate) {
+                                document.getElementById('editStartDate').value = data.discount.startDate.substring(0, 10);
+                            }
+                        }
+                        if (document.getElementById('editEndDate')) {
+                            if (data.discount.endDate) {
+                                document.getElementById('editEndDate').value = data.discount.endDate.substring(0, 10);
+                            }
+                        }
+                        if (document.getElementById('editStatus')) {
+                            document.getElementById('editStatus').value = data.discount.status;
+                        }
 
-		                if(document.getElementById('editCategories') && data.categories){
-		                    data.categories.forEach(category => {
-		                        if (data.discountDetails.some(detail => detail.category && detail.category.id === category.id)) {
-		                            document.getElementById('editCategories').querySelector('option[value="' + category.id + '"]').selected = true;
-		                        } else {
-		                            if(document.getElementById('editCategories').querySelector('option[value="' + category.id + '"]')){
-		                                document.getElementById('editCategories').querySelector('option[value="' + category.id + '"]').selected = false;
-		                            }
-		                        }
-		                    });
-		                }
+                        if(document.getElementById('editCategories') && data.categories){
+                            data.categories.forEach(category => {
+                                if (data.discountDetails.some(detail => detail.category && detail.category.id === category.id)) {
+                                    document.getElementById('editCategories').querySelector('option[value="' + category.id + '"]').selected = true;
+                                } else {
+                                    if(document.getElementById('editCategories').querySelector('option[value="' + category.id + '"]')){
+                                        document.getElementById('editCategories').querySelector('option[value="' + category.id + '"]').selected = false;
+                                    }
+                                }
+                            });
+                        }
 
-		                if(document.getElementById('editSubCategories') && data.subCategories){
-		                    data.subCategories.forEach(subCategory => {
-		                        if (data.discountDetails.some(detail => detail.subCategory && detail.subCategory.id === subCategory.id)) {
-		                            document.getElementById('editSubCategories').querySelector('option[value="' + subCategory.id + '"]').selected = true;
-		                        } else {
-		                            if(document.getElementById('editSubCategories').querySelector('option[value="' + subCategory.id + '"]')){
-		                                document.getElementById('editSubCategories').querySelector('option[value="' + subCategory.id + '"]').selected = false;
-		                            }
-		                        }
-		                    });
-		                }
+                        if(document.getElementById('editSubCategories') && data.subCategories){
+                            data.subCategories.forEach(subCategory => {
+                                if (data.discountDetails.some(detail => detail.subCategory && detail.subCategory.id === subCategory.id)) {
+                                    document.getElementById('editSubCategories').querySelector('option[value="' + subCategory.id + '"]').selected = true;
+                                } else {
+                                    if(document.getElementById('editSubCategories').querySelector('option[value="' + subCategory.id + '"]')){
+                                        document.getElementById('editSubCategories').querySelector('option[value="' + subCategory.id + '"]').selected = false;
+                                    }
+                                }
+                            });
+                        }
 
-		                if(document.getElementById('editProducts') && data.products){
-		                    data.products.forEach(product => {
-		                        if (data.discountDetails.some(detail => detail.product && detail.product.id === product.id)) {
-		                            document.getElementById('editProducts').querySelector('option[value="' + product.id + '"]').selected = true;
-		                        } else {
-		                            if(document.getElementById('editProducts').querySelector('option[value="' + product.id + '"]')){
-		                                document.getElementById('editProducts').querySelector('option[value="' + product.id + '"]').selected = false;
-		                            }
-		                        }
-		                    });
-		                }
+                        if(document.getElementById('editProducts') && data.products){
+                            data.products.forEach(product => {
+                                if (data.discountDetails.some(detail => detail.product && detail.product.id === product.id)) {
+                                    document.getElementById('editProducts').querySelector('option[value="' + product.id + '"]').selected = true;
+                                } else {
+                                    if(document.getElementById('editProducts').querySelector('option[value="' + product.id + '"]')){
+                                        document.getElementById('editProducts').querySelector('option[value="' + product.id + '"]').selected = false;
+                                    }
+                                }
+                            });
+                        }
 
-		                if (document.getElementById('editForm')) {
-		                    document.getElementById('editForm').action = '/discounts/edit/' + id;
-		                }
-		                if (editModal) {
-		                    editModal.style.display = "block";
-		                }
-		            })
-		            .catch(error => console.error('Error:', error));
-		    });
-		});
-
-		    closeEditModal.onclick = function() {
-		        editModal.style.display = "none";
-		    }
-
-		    window.onclick = function(event) {
-		        if (event.target == editModal) {
-		            editModal.style.display = "none";
-		        }
-		    }
-			document.querySelectorAll('.delete-btn').forEach(button => {
-			    button.addEventListener('click', function() {
-			        var id = this.getAttribute('data-id');
-			        if (confirm('Bạn có chắc chắn muốn xóa giảm giá này?')) {
-			            fetch('/discounts/delete/' + id) // Gửi yêu cầu GET
-			            .then(response => {
-			                if (response.ok) {
-			                    window.location.reload(); // Tải lại trang sau khi xóa thành công
-			                } else {
-			                    alert('Xóa thất bại.');
-			                }
-			            })
-			            .catch(error => console.error('Error:', error));
-			        }
-			    });
-			});
-			
+                        if (document.getElementById('editForm')) {
+                            document.getElementById('editForm').action = '/discounts/edit/' + id;
+                        }
+                        if (editModal) {
+                            var bootstrapModal = new bootstrap.Modal(editModal);
+                            bootstrapModal.show();
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
+        });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
