@@ -37,4 +37,5 @@ public class DiscountServiceImpl implements DiscountService {
     	discountDetailRepository.deleteByDiscountId(id);
         discountRepository.deleteById(id);
     }
+    
 }

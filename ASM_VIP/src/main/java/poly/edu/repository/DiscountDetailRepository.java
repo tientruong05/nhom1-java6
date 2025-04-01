@@ -4,6 +4,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
 import poly.edu.entity.DiscountDetailEntity;
 import poly.edu.entity.DiscountEntity;
 
@@ -27,5 +29,6 @@ public interface DiscountDetailRepository extends JpaRepository<DiscountDetailEn
     List<DiscountDetailEntity> findBySubCategoryIdAndStatus(@Param("subCategoryId") int subCategoryId, @Param("status") int status);
 
     List<DiscountDetailEntity> findByDiscount(DiscountEntity discount);
+    @Transactional
     void deleteByDiscountId(int discountId);
 }

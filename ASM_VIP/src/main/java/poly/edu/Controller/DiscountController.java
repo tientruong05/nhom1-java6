@@ -60,7 +60,7 @@ public class DiscountController {
                                  @RequestParam(value = "productIds", required = false) List<Integer> productIds) {
         discountRepository.save(discount);
         saveDiscountDetails(discount.getId(), categoryIds, subCategoryIds, productIds);
-        return "redirect:/discounts";
+        return "redirect:/java5/asm/admin/discounts";
     }
 
     @GetMapping("/edit/{id}")
@@ -99,6 +99,7 @@ public class DiscountController {
     }
 
     @PostMapping("/edit/{id}")
+    @Transactional
     public String updateDiscount(@PathVariable int id, @ModelAttribute DiscountEntity discount,
                                  @RequestParam(value = "categoryIds", required = false) List<Integer> categoryIds,
                                  @RequestParam(value = "subCategoryIds", required = false) List<Integer> subCategoryIds,
@@ -107,7 +108,7 @@ public class DiscountController {
         discountRepository.save(discount);
         discountDetailRepository.deleteByDiscountId(id);
         saveDiscountDetails(id, categoryIds, subCategoryIds, productIds);
-        return "redirect:/discounts";
+        return "redirect:/java5/asm/admin/discounts";
     }
 
     private void saveDiscountDetails(int discountId, List<Integer> categoryIds, List<Integer> subCategoryIds, List<Integer> productIds) {
@@ -145,6 +146,6 @@ public class DiscountController {
     public String deleteDiscount(@PathVariable int id) {
         discountDetailRepository.deleteByDiscountId(id);
     	discountService.delete(id);
-        return "redirect:/discounts";
+        return "redirect:/java5/asm/admin/discounts";
     }
 }
