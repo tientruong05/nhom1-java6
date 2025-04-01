@@ -19,7 +19,7 @@ public class ProductDTO {
     private int sellProgress; // % tiến trình đã bán
     private int status; // 0: không hoạt động, 1: hoạt động
     private String description;
-    private String subsetSubCategory;
+  
     private SubCategoryEntity subCategory; // Phần trăm giảm giá
     private boolean isDiscounted; 
 
