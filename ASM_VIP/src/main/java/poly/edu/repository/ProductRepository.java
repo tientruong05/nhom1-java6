@@ -69,4 +69,5 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
            "WHERE d.status = 1 AND dd.status = 1 " +
            "AND d.startDate <= CURRENT_DATE AND d.endDate >= CURRENT_DATE")
     List<ProductEntity> findProductsWithActiveDiscounts(Pageable pageable);
+    
 }

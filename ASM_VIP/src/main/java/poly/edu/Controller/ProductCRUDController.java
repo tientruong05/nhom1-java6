@@ -8,6 +8,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import poly.edu.DTO.ProductDTO;
 import poly.edu.entity.ProductEntity;
 import poly.edu.service.CategoryService;
 import poly.edu.service.ProductService;
@@ -52,7 +54,7 @@ public class ProductCRUDController {
             }
         }
 
-        Page<ProductEntity> productPage = productService.getFilteredProducts(search, categoryId, subCategoryId, statusInt, pageable);
+        Page<ProductDTO> productPage = productService.getFilteredProducts(search, categoryId, subCategoryId, statusInt, pageable);
 
         model.addAttribute("products", productPage.getContent());
         model.addAttribute("currentPage", page);

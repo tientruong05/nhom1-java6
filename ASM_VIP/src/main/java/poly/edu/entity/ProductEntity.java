@@ -9,6 +9,8 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "products")
 @Data
@@ -44,6 +46,7 @@ public class ProductEntity implements Serializable {
     private int status;
 
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<DiscountDetailEntity> discountDetails;
 
     // Tính giá sau giảm giá

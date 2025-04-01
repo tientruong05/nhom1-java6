@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html th:replace="~{/layout::view(~{::title}, ~{::body}, ~{::style})}" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Giảm Giá</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+	<style>
+		
+	</style>
+</head>
+<body>
+    <h1>Quản lý giảm giá</h1>
+
+    <h2>Tạo giảm giá mới</h2>
+    <button type="button" data-bs-toggle="modal" data-bs-target="#addDiscountModal">Thêm giảm giá</button>
+
+    <h2>Danh sách giảm giá</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tên giảm giá</th>
+                <th>Giá trị giảm giá (%)</th>
+                <th>Ngày bắt đầu</th>
+                <th>Ngày kết thúc</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="discount : ${discounts}">
+                <td th:text="${discount.id}"></td>
+                <td th:text="${discount.discountName}"></td>
+                <td th:text="${discount.discountValue}"></td>
+                <td th:text="${#dates.format(discount.startDate, 'dd/MM/yyyy')}"></td>
+                <td th:text="${#dates.format(discount.endDate, 'dd/MM/yyyy')}"></td>
+                <td>
+                    <button type="button" class="edit-btn" th:data-id="${discount.id}">Sửa</button>
+					<a th:href="@{/discounts/delete/{id}(id=${discount.id})}" 
+					                               class="btn btn-danger btn-sm" 
+					                               onclick="return confirm('Bạn có chắc chắn muốn xóa?');">
+					                               <i class="fas fa-trash"></i>
+					                            </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeEditModal">&times;</span>
+            <h2>Sửa giảm giá</h2>
+            <form id="editForm" method="post">
+                <input type="hidden" name="id" id="editId" />
+                <label>Tên giảm giá:</label>
+                <input type="text" name="discountName" id="editDiscountName" required /><br />
+                <label>Giá trị giảm giá (%):</label>
+                <input type="number" name="discountValue" id="editDiscountValue" required /><br />
+                <label>Ngày bắt đầu:</label>
+                <input type="date" name="startDate" id="editStartDate" required /><br />
+                <label>Ngày kết thúc:</label>
+                <input type="date" name="endDate" id="editEndDate" required /><br />
+                <label>Giảm giá theo hãng:</label><br />
+                <select name="categoryIds" id="editCategories" multiple>
+                    <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
+                </select><br />
+                <label>Giảm giá theo bộ sưu tập:</label><br />
+                <select name="subCategoryIds" id="editSubCategories" multiple>
+                    <option th:each="subCategory : ${subCategories}" th:value="${subCategory.id}" th:text="${subCategory.subCategoriesName}"></option>
+                </select><br />
+                <label>Giảm giá theo sản phẩm:</label><br />
+                <select name="productIds" id="editProducts" multiple>
+                    <option th:each="product : ${products}" th:value="${product.id}" th:text="${product.name}"></option>
+                </select><br />
+                <label>Trạng thái:</label><br />
+                <select name="status" id="editStatus">
+                    <option value="1">Hoạt động</option>
+                    <option value="0">Không hoạt động</option>
+                </select><br />
+                <button type="submit">Lưu</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="addDiscountModal" class="modal">
+        <div class="modal-content">
+            <span class="close" data-bs-dismiss="modal">&times;</span>
+            <h2>Thêm giảm giá</h2>
+            <form action="/discounts/create" method="post">
+                <label>Tên giảm giá:</label>
+                <input type="text" name="discountName" required /><br />
+                <label>Giá trị giảm giá (%):</label>
+                <input type="number" name="discountValue" required /><br />
+                <label>Ngày bắt đầu:</label>
+                <input type="date" name="startDate" required /><br />
+                <label>Ngày kết thúc:</label>
+                <input type="date" name="endDate" required /><br />
+                <label>Giảm giá theo hãng:</label><br />
+                <select name="categoryIds" multiple>
+                    <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
+                </select><br />
+                <label>Giảm giá theo bộ sưu tập:</label><br />
+                <select name="subCategoryIds" multiple>
+                    <option th:each="subCategory : ${subCategories}" th:value="${subCategory.id}" th:text="${subCategory.subCategoriesName}"></option>
+                </select><br />
+                <label>Giảm giá theo sản phẩm:</label><br />
+                <select name="productIds" multiple>
+                    <option th:each="product : ${products}" th:value="${product.id}" th:text="${product.name}"></option>
+                </select><br />
+                <label>Trạng thái:</label><br />
+                <select name="status">
+                    <option value="1">Hoạt động</option>
+                    <option value="0">Không hoạt động</option>
+                </select><br />
+                <button type="submit">Tạo</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+		var editModal = document.getElementById("editModal");
+		var closeEditModal = document.getElementById("closeEditModal");
+
+		document.querySelectorAll('.edit-btn').forEach(button => {
+		    button.addEventListener('click', function() {
+		        var id = this.getAttribute('data-id');
+		        fetch('/discounts/edit/' + id)
+		            .then(response => response.json())
+		            .then(data => {
+		                // Kiểm tra null trước khi truy cập các phần tử DOM
+		                if (document.getElementById('editId')) {
+		                    document.getElementById('editId').value = data.discount.id;
+		                }
+		                if (document.getElementById('editDiscountName')) {
+		                    document.getElementById('editDiscountName').value = data.discount.discountName;
+		                }
+		                if (document.getElementById('editDiscountValue')) {
+		                    document.getElementById('editDiscountValue').value = data.discount.discountValue;
+		                }
+		                if (document.getElementById('editStartDate')) {
+		                    // Xử lý ngày tháng an toàn hơn
+		                    if (data.discount.startDate) {
+		                        document.getElementById('editStartDate').value = data.discount.startDate.substring(0, 10);
+		                    }
+		                }
+		                if (document.getElementById('editEndDate')) {
+		                    // Xử lý ngày tháng an toàn hơn
+		                    if (data.discount.endDate) {
+		                        document.getElementById('editEndDate').value = data.discount.endDate.substring(0, 10);
+		                    }
+		                }
+		                if (document.getElementById('editStatus')) {
+		                    document.getElementById('editStatus').value = data.discount.status;
+		                }
+
+		                if(document.getElementById('editCategories') && data.categories){
+		                    data.categories.forEach(category => {
+		                        if (data.discountDetails.some(detail => detail.category && detail.category.id === category.id)) {
+		                            document.getElementById('editCategories').querySelector('option[value="' + category.id + '"]').selected = true;
+		                        } else {
+		                            if(document.getElementById('editCategories').querySelector('option[value="' + category.id + '"]')){
+		                                document.getElementById('editCategories').querySelector('option[value="' + category.id + '"]').selected = false;
+		                            }
+		                        }
+		                    });
+		                }
+
+		                if(document.getElementById('editSubCategories') && data.subCategories){
+		                    data.subCategories.forEach(subCategory => {
+		                        if (data.discountDetails.some(detail => detail.subCategory && detail.subCategory.id === subCategory.id)) {
+		                            document.getElementById('editSubCategories').querySelector('option[value="' + subCategory.id + '"]').selected = true;
+		                        } else {
+		                            if(document.getElementById('editSubCategories').querySelector('option[value="' + subCategory.id + '"]')){
+		                                document.getElementById('editSubCategories').querySelector('option[value="' + subCategory.id + '"]').selected = false;
+		                            }
+		                        }
+		                    });
+		                }
+
+		                if(document.getElementById('editProducts') && data.products){
+		                    data.products.forEach(product => {
+		                        if (data.discountDetails.some(detail => detail.product && detail.product.id === product.id)) {
+		                            document.getElementById('editProducts').querySelector('option[value="' + product.id + '"]').selected = true;
+		                        } else {
+		                            if(document.getElementById('editProducts').querySelector('option[value="' + product.id + '"]')){
+		                                document.getElementById('editProducts').querySelector('option[value="' + product.id + '"]').selected = false;
+		                            }
+		                        }
+		                    });
+		                }
+
+		                if (document.getElementById('editForm')) {
+		                    document.getElementById('editForm').action = '/discounts/edit/' + id;
+		                }
+		                if (editModal) {
+		                    editModal.style.display = "block";
+		                }
+		            })
+		            .catch(error => console.error('Error:', error));
+		    });
+		});
+
+		    closeEditModal.onclick = function() {
+		        editModal.style.display = "none";
+		    }
+
+		    window.onclick = function(event) {
+		        if (event.target == editModal) {
+		            editModal.style.display = "none";
+		        }
+		    }
+			document.querySelectorAll('.delete-btn').forEach(button => {
+			    button.addEventListener('click', function() {
+			        var id = this.getAttribute('data-id');
+			        if (confirm('Bạn có chắc chắn muốn xóa giảm giá này?')) {
+			            fetch('/discounts/delete/' + id) // Gửi yêu cầu GET
+			            .then(response => {
+			                if (response.ok) {
+			                    window.location.reload(); // Tải lại trang sau khi xóa thành công
+			                } else {
+			                    alert('Xóa thất bại.');
+			                }
+			            })
+			            .catch(error => console.error('Error:', error));
+			        }
+			    });
+			});
+			
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
