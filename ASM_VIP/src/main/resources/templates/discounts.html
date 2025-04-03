@@ -279,7 +279,7 @@
 								</div>
 								<div class="mb-3">
 									<label class="form-label">Giảm giá theo bộ sưu tập:</label>
-								    <select name="subCategory.id" class="form-select" required id="editSubCategories">
+								    <select name="subCategoryIds" class="form-select" required id="editSubCategories">
 								    <option value="" disabled>Chọn bộ sưu tập</option>
 								    <option th:each="subCategory : ${subCategories}" th:value="${subCategory.id}" th:text="${subCategory.subCategoriesName}" th:data-category="${subCategory.subCategoriesName}"></option>
 								    </select>
@@ -344,7 +344,7 @@
 								</div>
 								<div class="mb-3">
 									<label class="form-label">Giảm giá theo bộ sưu tập:</label>
-								    <select name="subCategory.id" class="form-select" required id="">
+								    <select name="subCategoryIds" class="form-select" required id="">
 								    <option value="" disabled>Chọn bộ sưu tập</option>
 								    <option th:each="subCategory : ${subCategories}" th:value="${subCategory.id}" th:text="${subCategory.subCategoriesName}" th:data-category="${subCategory.subCategoriesName}"></option>
 								    </select>
