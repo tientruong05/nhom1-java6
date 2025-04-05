@@ -72,4 +72,10 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
 
     @Query("SELECT p FROM ProductEntity p WHERE p.id IN :ids AND p.status = :status")
     List<ProductEntity> findByIdInAndStatus(@Param("ids") List<Integer> ids, @Param("status") int status);
+
+    @Query("SELECT p FROM ProductEntity p WHERE p.subCategory.category.id IN :categoryIds AND p.status = :status")
+    List<ProductEntity> findByCategoryIdsAndStatus(@Param("categoryIds") List<Integer> categoryIds, @Param("status") int status);
+    
+    @Query("SELECT p FROM ProductEntity p WHERE p.subCategory.id IN :subCategoryIds AND p.status = :status")
+    List<ProductEntity> findBySubCategoryIdsAndStatus(@Param("subCategoryIds") List<Integer> subCategoryIds, @Param("status") int status);
 }
