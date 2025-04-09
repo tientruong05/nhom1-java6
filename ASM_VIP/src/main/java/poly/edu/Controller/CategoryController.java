@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import poly.edu.config.FlashSaleManager;
 import poly.edu.dao.SubCategoryDAO;
+import poly.edu.DTO.ProductDTO;
 import poly.edu.entity.ProductEntity;
 import poly.edu.entity.SubCategoryEntity;
 import poly.edu.service.CategoryService;
@@ -41,33 +42,76 @@ public class CategoryController {
                                Model model) {
         Pageable pageable = PageRequest.of(page, size);
 
-        return Optional.of(determineProductPage(categoryId, subCategoryId, brandName, discount, search, gender, priceRange, pageable))
-                .map(productPage -> {
-                    String categoryName = determineCategoryName(categoryId, subCategoryId, brandName, discount);
-                    boolean showGenderFilter = determineGenderFilter(categoryId, subCategoryId);
+        String effectiveGender = gender;
+        Integer effectiveCategoryId = categoryId;
+        String pageTitleGender = null;
+        
+        // Quản lý đặc biệt cho pages gender (categoryId 1 và 2)
+        boolean isGenderPage = false;
+        Integer originalGenderId = null; // Lưu lại categoryId gốc nếu là gender page
 
-                    model.addAttribute("products", productPage.getContent());
-                    model.addAttribute("currentPage", productPage.getNumber());
-                    model.addAttribute("totalPages", productPage.getTotalPages());
-                    model.addAttribute("pageSize", productPage.getSize());
-                    model.addAttribute("totalItems", productPage.getTotalElements());
-                    model.addAttribute("categoryName", categoryName);
-                    model.addAttribute("categoryId", categoryId);
-                    model.addAttribute("subCategoryId", subCategoryId);
-                    model.addAttribute("brandName", brandName);
-                    model.addAttribute("discount", discount);
-                    model.addAttribute("search", search);
-                    model.addAttribute("gender", gender);
-                    model.addAttribute("priceRange", priceRange);
-                    model.addAttribute("showGenderFilter", showGenderFilter);
-                    model.addAttribute("isFlashSaleActive", FlashSaleManager.isFlashSaleActive());
-                    model.addAttribute("flashSaleEndTime", FlashSaleManager.getEndTime());
-                    return "category";
-                })
-                .orElseGet(() -> "redirect:/java5/asm/");
+        if (categoryId != null && subCategoryId == null && brandName == null && discount == null) {
+            if (categoryId == 1) {
+                effectiveGender = "male";
+                pageTitleGender = "Đồng hồ nam";
+                effectiveCategoryId = null;
+                isGenderPage = true;
+                originalGenderId = 1; // Lưu lại id cho gender nam
+            } else if (categoryId == 2) {
+                effectiveGender = "female";
+                pageTitleGender = "Đồng hồ nữ";
+                effectiveCategoryId = null;
+                isGenderPage = true;
+                originalGenderId = 2; // Lưu lại id cho gender nữ
+            }
+        } else if (gender != null && (gender.equals("male") || gender.equals("female"))) {
+            // Nếu có gender filter mà không có categoryId, cũng coi như gender page
+            isGenderPage = true;
+            originalGenderId = gender.equals("male") ? 1 : 2;
+            pageTitleGender = gender.equals("male") ? "Đồng hồ nam" : "Đồng hồ nữ";
+        }
+
+        Page<ProductDTO> productPage = determineProductPage(effectiveCategoryId, subCategoryId, brandName, discount, search, effectiveGender, priceRange, pageable);
+
+        // Dùng originalGenderId để hiển thị title và ẩn filter đúng trên các trang phân trang
+        String categoryName = determineCategoryName(originalGenderId != null ? originalGenderId : categoryId, 
+                                                   subCategoryId, brandName, discount, pageTitleGender);
+        
+        // Ưu tiên xác định showGenderFilter dựa trên originalGenderId
+        boolean showGenderFilter;
+        if (originalGenderId != null) {
+            showGenderFilter = false; // Không hiển thị filter gender nếu đang ở trang gender
+        } else {
+            showGenderFilter = determineGenderFilter(categoryId, subCategoryId);
+        }
+
+        model.addAttribute("products", productPage.getContent());
+        model.addAttribute("currentPage", productPage.getNumber());
+        model.addAttribute("totalPages", productPage.getTotalPages());
+        model.addAttribute("pageSize", productPage.getSize());
+        model.addAttribute("totalItems", productPage.getTotalElements());
+        model.addAttribute("categoryName", categoryName);
+        
+        // Đối với trang gender, không lưu categoryId để pagination
+        model.addAttribute("categoryId", isGenderPage ? null : categoryId);
+        
+        // Thêm flag đánh dấu là trang gender để template dùng
+        model.addAttribute("isGenderPage", isGenderPage);
+        model.addAttribute("originalGenderId", originalGenderId);
+        
+        model.addAttribute("subCategoryId", subCategoryId);
+        model.addAttribute("brandName", brandName);
+        model.addAttribute("discount", discount);
+        model.addAttribute("search", search);
+        model.addAttribute("gender", effectiveGender);
+        model.addAttribute("priceRange", priceRange);
+        model.addAttribute("showGenderFilter", showGenderFilter);
+        model.addAttribute("isFlashSaleActive", FlashSaleManager.isFlashSaleActive());
+        model.addAttribute("flashSaleEndTime", FlashSaleManager.getEndTime());
+        return "category";
     }
 
-    private Page<ProductEntity> determineProductPage(Integer categoryId, Integer subCategoryId, String brandName,
+    private Page<ProductDTO> determineProductPage(Integer categoryId, Integer subCategoryId, String brandName,
                                                      Boolean discount, String search, String gender, String priceRange,
                                                      Pageable pageable) {
         if (Boolean.TRUE.equals(discount)) {
@@ -83,7 +127,11 @@ public class CategoryController {
         }
     }
 
-    private String determineCategoryName(Integer categoryId, Integer subCategoryId, String brandName, Boolean discount) {
+    private String determineCategoryName(Integer categoryId, Integer subCategoryId, String brandName, Boolean discount, String pageTitleGender) {
+        if (pageTitleGender != null) {
+            return pageTitleGender;
+        }
+
         if (Boolean.TRUE.equals(discount)) {
             return "Hàng giảm giá";
         } else if (brandName != null && !brandName.isEmpty()) {

@@ -34,4 +34,20 @@ public interface DiscountDAO extends JpaRepository<DiscountEntity, Integer> {
            "AND d.startDate <= CURRENT_DATE " +
            "AND d.endDate >= CURRENT_DATE")
     List<DiscountEntity> findAllActiveDiscounts();
+
+    @Query("SELECT DISTINCT d FROM DiscountEntity d " +
+           "JOIN d.discountDetails dd " +
+           "WHERE d.status = 1 " +
+           "AND d.startDate <= CURRENT_DATE " +
+           "AND d.endDate >= CURRENT_DATE " +
+           "AND dd.status = 1 AND (" +
+           "   (dd.product IS NOT NULL AND dd.product.id = :productId) OR " +
+           "   (dd.category IS NOT NULL AND dd.category.id = :categoryId) OR " +
+           "   (dd.subCategory IS NOT NULL AND dd.subCategory.id = :subCategoryId)" +
+           ")")
+    List<DiscountEntity> findAllActiveDiscountsForProduct(
+        @Param("productId") int productId,
+        @Param("categoryId") int categoryId,
+        @Param("subCategoryId") int subCategoryId
+    );
 } 
