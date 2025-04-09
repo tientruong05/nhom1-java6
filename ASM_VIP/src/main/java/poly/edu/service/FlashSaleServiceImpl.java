@@ -3,6 +3,8 @@ package poly.edu.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import poly.edu.DTO.ProductDTO;
 import poly.edu.dao.DiscountDAO;
@@ -123,6 +125,47 @@ public class FlashSaleServiceImpl implements FlashSaleService {
     }
     
     @Override
+    public Page<ProductDTO> getFlashSaleProductsPaged(Pageable pageable) {
+        try {
+            // Lấy thông tin khuyến mãi đang hoạt động
+            Optional<DiscountEntity> discountOpt = discountDAO.findActiveFlashSale();
+            if (!discountOpt.isPresent()) {
+                discountOpt = discountDAO.findActiveFlashSaleNative();
+            }
+            
+            if (discountOpt.isPresent()) {
+                DiscountEntity discount = discountOpt.get();
+                
+                // Lấy tất cả sản phẩm trong flash sale
+                List<ProductDTO> allProducts = getDiscountSaleProducts(discountOpt);
+                
+                // Tạo Page thủ công từ List và Pageable
+                int start = (int) pageable.getOffset();
+                int end = Math.min((start + pageable.getPageSize()), allProducts.size());
+                
+                if (start > allProducts.size()) {
+                    return new org.springframework.data.domain.PageImpl<>(
+                        java.util.Collections.emptyList(), pageable, allProducts.size());
+                }
+                
+                List<ProductDTO> pageContent = allProducts.subList(start, end);
+                
+                return new org.springframework.data.domain.PageImpl<>(
+                    pageContent, pageable, allProducts.size());
+            }
+            
+            // Trả về Page rỗng nếu không có flash sale
+            return new org.springframework.data.domain.PageImpl<>(
+                java.util.Collections.emptyList(), pageable, 0);
+        } catch (Exception e) {
+            logger.error("Error getting paged flash sale products", e);
+            // Trả về Page rỗng khi có lỗi
+            return new org.springframework.data.domain.PageImpl<>(
+                java.util.Collections.emptyList(), pageable, 0);
+        }
+    }
+    
+    @Override
     public List<ProductDTO> getFlashSaleProductsForHomepage() {
         List<ProductDTO> allProducts = getFlashSaleProducts();
         return allProducts.size() > 4 ? allProducts.subList(0, 4) : allProducts;
@@ -133,13 +176,52 @@ public class FlashSaleServiceImpl implements FlashSaleService {
                 .map(discount -> {
                     List<Integer> productIds = discountDetailRepository.findProductIdsByDiscountId(discount.getId());
                     logger.debug("Found {} product IDs for discount ID {}", productIds.size(), discount.getId());
-                    List<ProductEntity> products = productRepository.findByIdInAndStatus(productIds, 1);
-                    logger.debug("Found {} active products for flash sale ID {}", products.size(), discount.getId());
-                    return products.stream()
+                    
+                    // Lấy danh sách category ID và sub category ID từ discount_details
+                    List<Integer> categoryIds = discountDetailRepository.findCategoryIdsByDiscountId(discount.getId());
+                    List<Integer> subCategoryIds = discountDetailRepository.findSubCategoryIdsByDiscountId(discount.getId());
+                    
+                    logger.debug("Found {} category IDs and {} sub-category IDs for discount ID {}", 
+                               categoryIds.size(), subCategoryIds.size(), discount.getId());
+                    
+                    // Lấy sản phẩm từ product_id trực tiếp
+                    List<ProductEntity> directProducts = productRepository.findByIdInAndStatus(productIds, 1);
+                    
+                    // Lấy sản phẩm thuộc các danh mục
+                    List<ProductEntity> categoryProducts = productRepository.findByCategoryIdsAndStatus(categoryIds, 1);
+                    
+                    // Lấy sản phẩm thuộc các danh mục con
+                    List<ProductEntity> subCategoryProducts = productRepository.findBySubCategoryIdsAndStatus(subCategoryIds, 1);
+                    
+                    // Gộp các danh sách sản phẩm (loại bỏ trùng lặp)
+                    List<ProductEntity> allProducts = new java.util.ArrayList<>(directProducts);
+                    
+                    // Thêm categoryProducts nhưng loại bỏ các sản phẩm đã có trong directProducts
+                    for (ProductEntity product : categoryProducts) {
+                        if (!containsProduct(allProducts, product.getId())) {
+                            allProducts.add(product);
+                        }
+                    }
+                    
+                    // Thêm subCategoryProducts nhưng loại bỏ các sản phẩm đã có
+                    for (ProductEntity product : subCategoryProducts) {
+                        if (!containsProduct(allProducts, product.getId())) {
+                            allProducts.add(product);
+                        }
+                    }
+                    
+                    logger.debug("Total flash sale products after combining: {}", allProducts.size());
+                    
+                    return allProducts.stream()
                             .map(product -> mapToProductDTO(product, discount))
                             .collect(Collectors.toList());
                 })
                 .orElse(List.of());
+    }
+    
+    // Helper method to check if a product already exists in the list
+    private boolean containsProduct(List<ProductEntity> products, int productId) {
+        return products.stream().anyMatch(p -> p.getId() == productId);
     }
     
     @Override

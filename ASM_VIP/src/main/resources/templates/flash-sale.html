@@ -1,327 +1,650 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Flash Sale - Watch Store</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet"/>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css"
+      rel="stylesheet"
+    />
     <style>
       /* Sử dụng CSS từ trang category */
-      body { font-family: "Segoe UI", sans-serif; background-color: #ecf0f1; color: #34495e; }
+      body {
+        font-family: "Segoe UI", sans-serif;
+        color: #34495e;
+      }
       .flash-sale-header {
-          background-color: #ff4444;
-          color: white;
-          padding: 30px 0;
-          text-align: center;
-          margin-bottom: 30px;
-          box-shadow: 0 4px 15px rgba(255, 68, 68, 0.2);
+        background-color: #b22210;
+        color: white;
+        padding: 30px 0;
+        text-align: center;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(255, 68, 68, 0.2);
       }
       .flash-sale-title {
-          font-size: 2.5rem;
-          font-weight: bold;
-          margin-bottom: 10px;
-          text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
       }
       .countdown-container {
-          display: flex;
-          justify-content: center;
-          margin-top: 25px;
-          perspective: 1000px;
+        display: flex;
+        justify-content: center;
+        margin-top: 25px;
+        perspective: 1000px;
       }
       .countdown-box {
-          background: linear-gradient(145deg, #333333, #222222);
-          color: white;
-          padding: 15px;
-          border-radius: 10px;
-          margin: 0 8px;
-          min-width: 80px;
-          text-align: center;
-          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          transition: all 0.3s ease;
+        background: linear-gradient(145deg, #333333, #222222);
+        color: white;
+        padding: 15px;
+        border-radius: 10px;
+        margin: 0 8px;
+        min-width: 80px;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
       }
       .countdown-box:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
       }
       .countdown-number {
-          font-size: 2.2rem;
-          font-weight: bold;
-          margin-bottom: 5px;
-          display: block;
-          color: #ffffff;
+        font-size: 2.2rem;
+        font-weight: bold;
+        margin-bottom: 5px;
+        display: block;
+        color: #ffffff;
       }
       .countdown-label {
-          font-size: 0.9rem;
-          text-transform: uppercase;
-          color: #f8f8f8;
-          letter-spacing: 1px;
-          opacity: 0.9;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        color: #f8f8f8;
+        letter-spacing: 1px;
+        opacity: 0.9;
       }
-      
+
       /* Media queries for responsiveness */
       @media (max-width: 576px) {
-          .countdown-box {
-              padding: 10px;
-              min-width: 60px;
-              margin: 0 4px;
-          }
-          .countdown-number {
-              font-size: 1.6rem;
-          }
-          .countdown-label {
-              font-size: 0.7rem;
-          }
+        .countdown-box {
+          padding: 10px;
+          min-width: 60px;
+          margin: 0 4px;
+        }
+        .countdown-number {
+          font-size: 1.6rem;
+        }
+        .countdown-label {
+          font-size: 0.7rem;
+        }
       }
       /* Sử dụng CSS product-grid từ category */
       .product-grid {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 30px;
-          padding: 0 15px;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 30px;
+        padding: 0 15px;
       }
       @media (max-width: 1200px) {
-          .product-grid { grid-template-columns: repeat(3, 1fr); }
+        .product-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
       }
       @media (max-width: 768px) {
-          .product-grid { grid-template-columns: repeat(2, 1fr); }
+        .product-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
       }
       @media (max-width: 576px) {
-          .product-grid { grid-template-columns: 1fr; }
+        .product-grid {
+          grid-template-columns: 1fr;
+        }
       }
-      
+
       /* Sử dụng CSS product-card từ category */
-      .product-card { background: white; border-radius: 10px; overflow: hidden; transition: all 0.3s ease; height: 100%; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); }
-      .product-card:hover { transform: translateY(-10px); box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15); }
-      .product-img-container { position: relative; overflow: hidden; padding-top: 100%; background-color: #f5f6f7; }
-      .product-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
-      .product-card:hover .product-img { transform: scale(1.1); }
-      .discount-badge { position: absolute; top: 0; right: 0; background-color: #e74c3c; color: white; padding: 8px 10px; font-weight: bold; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); }
-      .discount-badge span:first-child { font-size: 1.2rem; font-weight: 700; line-height: 1; }
-      .discount-badge span:last-child { font-size: 1rem; font-weight: 600; }
-      .product-card:hover .discount-badge { transform: scale(1.05); transition: transform 0.3s ease; }
-      .product-info { padding: 15px; text-align: center; }
-      .product-title { color: #34495e; font-size: 1.1rem; margin-bottom: 10px; height: 2.4em; overflow: hidden; }
-      .product-price { color: #e74c3c; font-weight: bold; font-size: 1.2rem; margin-bottom: 0; }
-      .product-price .original-price { text-decoration: line-through; color: #999; font-size: 0.9rem; font-weight: normal; margin-left: 8px; }
-      .product-price .discount-price { color: #e74c3c; font-weight: bold; }
-      .quick-view-btn { position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%); background-color: white; color: black; border: none; border-radius: 5px; padding: 8px 15px; transition: all 0.3s ease; opacity: 0; }
-      .quick-view-btn:hover { background-color: #e74c3c !important; color: white !important; }
-      .product-card:hover .quick-view-btn { bottom: 20px; opacity: 1; }
-      
-      .no-flash-sale {
-          text-align: center;
-          padding: 50px;
-          background: white;
-          border-radius: 10px;
-          margin: 30px 0;
-          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      .product-card {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        height: 100%;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
       }
-      .toast-container { position: fixed; top: 20px; right: 20px; z-index: 1055; }
-      .toast { border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); min-width: 300px; background-color: #fff; border: none; }
-      .toast-header { background-color: transparent; border-bottom: none; padding: 10px 15px; }
-      .toast-header .me-auto { font-weight: 500; color: #34495e; }
-      .toast-body { padding: 10px 15px; color: #34495e; font-size: 0.9rem; }
-      .toast-success .toast-header { color: #28a745; }
-      .toast-success .toast-header i { margin-right: 8px; }
-      .toast-error .toast-header { color: #dc3545; }
-      .toast-error .toast-header i { margin-right: 8px; }
-      .toast .btn-close { filter: invert(0.5); }
+      .product-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
+      }
+      .product-img-container {
+        position: relative;
+        overflow: hidden;
+        padding-top: 100%;
+        background-color: #f5f6f7;
+      }
+      .product-img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+      }
+      .product-card:hover .product-img {
+        transform: scale(1.1);
+      }
+      .discount-badge {
+        position: absolute;
+        top: 0;
+        right: 0;
+        background-color: #e74c3c;
+        color: white;
+        padding: 8px 10px;
+        font-weight: bold;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      }
+      .discount-badge span:first-child {
+        font-size: 1.2rem;
+        font-weight: 700;
+        line-height: 1;
+      }
+      .discount-badge span:last-child {
+        font-size: 1rem;
+        font-weight: 600;
+      }
+      .product-card:hover .discount-badge {
+        transform: scale(1.05);
+        transition: transform 0.3s ease;
+      }
+      .product-info {
+        padding: 15px;
+        text-align: center;
+      }
+      .product-title {
+        color: #34495e;
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+        height: 2.4em;
+        overflow: hidden;
+      }
+      .product-price {
+        color: #e74c3c;
+        font-weight: bold;
+        font-size: 1.2rem;
+        margin-bottom: 0;
+      }
+      .product-price .original-price {
+        text-decoration: line-through;
+        color: #999;
+        font-size: 0.9rem;
+        font-weight: normal;
+        margin-left: 8px;
+      }
+      .product-price .discount-price {
+        color: #e74c3c;
+        font-weight: bold;
+      }
+      .quick-view-btn {
+        position: absolute;
+        bottom: -50px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: white;
+        color: black;
+        border: none;
+        border-radius: 5px;
+        padding: 8px 15px;
+        transition: all 0.3s ease;
+        opacity: 0;
+      }
+      .quick-view-btn:hover {
+        background-color: #e74c3c !important;
+        color: white !important;
+      }
+      .product-card:hover .quick-view-btn {
+        bottom: 20px;
+        opacity: 1;
+      }
+
+      .no-flash-sale {
+        text-align: center;
+        padding: 50px;
+        background: white;
+        border-radius: 10px;
+        margin: 30px 0;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      }
+      .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1055;
+      }
+      .toast {
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        min-width: 300px;
+        background-color: #fff;
+        border: none;
+      }
+      .toast-header {
+        background-color: transparent;
+        border-bottom: none;
+        padding: 10px 15px;
+      }
+      .toast-header .me-auto {
+        font-weight: 500;
+        color: #34495e;
+      }
+      .toast-body {
+        padding: 10px 15px;
+        color: #34495e;
+        font-size: 0.9rem;
+      }
+      .toast-success .toast-header {
+        color: #28a745;
+      }
+      .toast-success .toast-header i {
+        margin-right: 8px;
+      }
+      .toast-error .toast-header {
+        color: #dc3545;
+      }
+      .toast-error .toast-header i {
+        margin-right: 8px;
+      }
+      .toast .btn-close {
+        filter: invert(0.5);
+      }
       @media (max-width: 576px) {
-          .toast-container { top: 10px; right: 10px; left: 10px; width: auto; }
-          .toast { min-width: 100%; }
+        .toast-container {
+          top: 10px;
+          right: 10px;
+          left: 10px;
+          width: auto;
+        }
+        .toast {
+          min-width: 100%;
+        }
+      }
+
+      /* Phân trang */
+      .pagination {
+        justify-content: center;
+        margin-top: 40px;
+      }
+      .page-link {
+        color: #e74c3c;
+        border: none;
+        padding: 10px 15px;
+        margin: 0 5px;
+        transition: all 0.3s ease;
+      }
+      .page-link:hover {
+        background-color: #e74c3c;
+        color: white;
+      }
+      .page-item.active .page-link {
+        background-color: #e74c3c;
+        color: white;
+      }
+      .page-item.disabled .page-link {
+        color: #ccc;
+      }
+      .result-count {
+        text-align: center;
+        color: #34495e;
+        margin-bottom: 20px;
       }
     </style>
-    <link rel="stylesheet" th:href="@{/css/header.css}"/>
-    <link rel="stylesheet" th:href="@{/css/footer.css}"/>
-</head>
-<body>
-<div th:replace="fragments/header :: header"></div>
+    <link rel="stylesheet" th:href="@{/css/header.css}" />
+    <link rel="stylesheet" th:href="@{/css/footer.css}" />
+  </head>
+  <body>
+    <div th:replace="fragments/header :: header"></div>
 
-<!-- Toast Container -->
-<div class="toast-container">
-    <div th:if="${success != null}" class="toast toast-success show" role="alert" aria-live="assertive" aria-atomic="true">
+    <!-- Toast Container -->
+    <div class="toast-container">
+      <div
+        th:if="${success != null}"
+        class="toast toast-success show"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+      >
         <div class="toast-header">
-            <i class="fas fa-check-circle"></i>
-            <strong class="me-auto">Thành công</strong>
-            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+          <i class="fas fa-check-circle"></i>
+          <strong class="me-auto">Thành công</strong>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="toast"
+            aria-label="Close"
+          ></button>
         </div>
         <div class="toast-body" th:text="${success}"></div>
-    </div>
-    <div th:if="${error != null}" class="toast toast-error show" role="alert" aria-live="assertive" aria-atomic="true">
+      </div>
+      <div
+        th:if="${error != null}"
+        class="toast toast-error show"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+      >
         <div class="toast-header">
-            <i class="fas fa-times-circle"></i>
-            <strong class="me-auto">Lỗi</strong>
-            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+          <i class="fas fa-times-circle"></i>
+          <strong class="me-auto">Lỗi</strong>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="toast"
+            aria-label="Close"
+          ></button>
         </div>
         <div class="toast-body" th:text="${error}"></div>
+      </div>
     </div>
-</div>
 
-<div class="container-fluid">
-    <!-- Flash Sale Header with Countdown -->
-    <div th:if="${isFlashSaleActive}" class="flash-sale-header">
+    <div class="container-fluid">
+      <!-- Flash Sale Header with Countdown -->
+      <div th:if="${isFlashSaleActive}" class="flash-sale-header">
         <div class="container">
-            <h1 class="flash-sale-title"><i class="fas fa-bolt"></i> FLASH SALE</h1>
-            <h3 class="text-white" th:if="${flashSaleName != null}" th:text="${flashSaleName}">Khuyến mãi Mùa Hè</h3>
-            <p class="lead">Giảm giá sốc chỉ trong thời gian giới hạn!</p>
-            
-            <div class="countdown-container">
-                <div class="countdown-box">
-                    <div class="countdown-number" id="days">00</div>
-                    <div class="countdown-label">ngày</div>
-                </div>
-                <div class="countdown-box">
-                    <div class="countdown-number" id="hours">00</div>
-                    <div class="countdown-label">giờ</div>
-                </div>
-                <div class="countdown-box">
-                    <div class="countdown-number" id="minutes">00</div>
-                    <div class="countdown-label">phút</div>
-                </div>
-                <div class="countdown-box">
-                    <div class="countdown-number" id="seconds">00</div>
-                    <div class="countdown-label">giây</div>
-                </div>
-            </div>
-        </div>
-    </div>
+          <h1 class="flash-sale-title">
+            <i class="fas fa-bolt"></i> FLASH SALE
+          </h1>
+          <p class="lead">Giảm giá sốc chỉ trong thời gian giới hạn!</p>
 
-    <div class="container mb-5">
-        <div th:if="${isFlashSaleActive}">
-            <div class="product-grid">
-                <div th:each="product : ${flashSaleProducts}">
-                    <div class="product-card">
-                        <div class="product-img-container">
-                            <!-- Discount Badge -->
-                            <div class="discount-badge" th:if="${product.discountPercentage != null}">
-                                <span th:text="${#numbers.formatDecimal(product.discountPercentage, 0, 'POINT', 0, 'POINT') + '%'}">30%</span>
-                                <span>OFF</span>
-                            </div>
-                            
-                            <img th:src="@{'/photos/' + ${product.image}}" class="product-img" alt="Watch" />
-                            <a class="quick-view-btn btn" th:href="@{'/java5/asm/products/detail/' + ${product.id}}">Xem nhanh</a>
-                        </div>
-                        
-                        <!-- Product Info -->
-                        <div class="product-info">
-                            <h3 class="product-title" th:text="${product.name}">Watch Name</h3>
-                            <p class="product-price">
-                                <span th:if="${product.discountPercentage != null}">
-                                    <span class="discount-price" th:text="${#numbers.formatDecimal(product.discountedPrice, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"></span>
-                                    <span class="original-price" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"></span>
-                                </span>
-                            </p>
-                        </div>
-                    </div>
-                </div>
+          <div class="countdown-container">
+            <div class="countdown-box">
+              <div class="countdown-number" id="days">00</div>
+              <div class="countdown-label">ngày</div>
             </div>
+            <div class="countdown-box">
+              <div class="countdown-number" id="hours">00</div>
+              <div class="countdown-label">giờ</div>
+            </div>
+            <div class="countdown-box">
+              <div class="countdown-number" id="minutes">00</div>
+              <div class="countdown-label">phút</div>
+            </div>
+            <div class="countdown-box">
+              <div class="countdown-number" id="seconds">00</div>
+              <div class="countdown-label">giây</div>
+            </div>
+          </div>
         </div>
-        
+      </div>
+
+      <div class="container mb-5">
+        <div th:if="${isFlashSaleActive}">
+          <p
+            class="result-count"
+            th:text="'Tìm thấy ' + ${totalItems} + ' sản phẩm'"
+          >
+            Tìm thấy X sản phẩm
+          </p>
+          <div class="product-grid">
+            <div th:each="product : ${flashSaleProducts}">
+              <div class="product-card">
+                <div class="product-img-container">
+                  <!-- Discount Badge -->
+                  <div
+                    class="discount-badge"
+                    th:if="${product.discountPercentage != null}"
+                  >
+                    <span
+                      th:text="${#numbers.formatDecimal(product.discountPercentage, 0, 'POINT', 0, 'POINT') + '%'}"
+                      >30%</span
+                    >
+                    <span>OFF</span>
+                  </div>
+
+                  <img
+                    th:src="@{'/photos/' + ${product.image}}"
+                    class="product-img"
+                    alt="Watch"
+                  />
+                  <a
+                    class="quick-view-btn btn"
+                    th:href="@{'/java5/asm/products/detail/' + ${product.id}}"
+                    >Xem nhanh</a
+                  >
+                </div>
+
+                <!-- Product Info -->
+                <div class="product-info">
+                  <h3 class="product-title" th:text="${product.name}">
+                    Watch Name
+                  </h3>
+                  <p class="product-price">
+                    <span th:if="${product.discountPercentage != null}">
+                      <span
+                        class="discount-price"
+                        th:text="${#numbers.formatDecimal(product.discountedPrice, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"
+                      ></span>
+                      <span
+                        class="original-price"
+                        th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"
+                      ></span>
+                    </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Phân trang -->
+          <nav aria-label="Page navigation" th:if="${totalPages > 1}">
+            <ul class="pagination">
+              <li
+                class="page-item"
+                th:classappend="${currentPage == 0} ? 'disabled'"
+              >
+                <a
+                  class="page-link"
+                  th:href="@{/java5/asm/flash-sale(page=${currentPage - 1}, size=${pageSize})}"
+                  aria-label="Previous"
+                >
+                  <span aria-hidden="true">«</span>
+                </a>
+              </li>
+              <li
+                class="page-item"
+                th:each="i : ${#numbers.sequence(0, 2)}"
+                th:if="${i < totalPages}"
+                th:classappend="${currentPage == i} ? 'active'"
+              >
+                <a
+                  class="page-link"
+                  th:href="@{/java5/asm/flash-sale(page=${i}, size=${pageSize})}"
+                  th:text="${i + 1}"
+                ></a>
+              </li>
+              <li
+                class="page-item"
+                th:if="${totalPages > 6 and currentPage > 3}"
+              >
+                <span class="page-link">...</span>
+              </li>
+              <li
+                class="page-item"
+                th:each="i : ${#numbers.sequence(currentPage - 1, currentPage + 1)}"
+                th:if="${i >= 3 and i < totalPages - 3 and i >= 0}"
+                th:classappend="${currentPage == i} ? 'active'"
+              >
+                <a
+                  class="page-link"
+                  th:href="@{/java5/asm/flash-sale(page=${i}, size=${pageSize})}"
+                  th:text="${i + 1}"
+                ></a>
+              </li>
+              <li
+                class="page-item"
+                th:if="${totalPages > 6 and currentPage < totalPages - 4}"
+              >
+                <span class="page-link">...</span>
+              </li>
+              <li
+                class="page-item"
+                th:each="i : ${#numbers.sequence(totalPages - 3, totalPages - 1)}"
+                th:if="${totalPages > 3 and i >= 3}"
+                th:classappend="${currentPage == i} ? 'active'"
+              >
+                <a
+                  class="page-link"
+                  th:href="@{/java5/asm/flash-sale(page=${i}, size=${pageSize})}"
+                  th:text="${i + 1}"
+                ></a>
+              </li>
+              <li
+                class="page-item"
+                th:classappend="${currentPage == totalPages - 1} ? 'disabled'"
+              >
+                <a
+                  class="page-link"
+                  th:href="@{/java5/asm/flash-sale(page=${currentPage + 1}, size=${pageSize})}"
+                  aria-label="Next"
+                >
+                  <span aria-hidden="true">»</span>
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+
         <!-- Display when no flash sale is active -->
         <div th:unless="${isFlashSaleActive}" class="no-flash-sale">
-            <i class="fas fa-clock fa-4x mb-3 text-muted"></i>
-            <h2>Không có Flash Sale nào đang diễn ra</h2>
-            <p class="lead">Vui lòng quay lại sau để không bỏ lỡ các ưu đãi đặc biệt!</p>
-            <a href="/java5/asm/" class="btn btn-primary mt-3">Quay lại trang chủ</a>
+          <i class="fas fa-clock fa-4x mb-3 text-muted"></i>
+          <h2>Không có Flash Sale nào đang diễn ra</h2>
+          <p class="lead">
+            Vui lòng quay lại sau để không bỏ lỡ các ưu đãi đặc biệt!
+          </p>
+          <a href="/java5/asm/" class="btn btn-primary mt-3"
+            >Quay lại trang chủ</a
+          >
         </div>
+      </div>
     </div>
-</div>
 
-<div th:replace="fragments/footer :: footer"></div>
+    <div th:replace="fragments/footer :: footer"></div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
         // Initialize toast
         const toasts = document.querySelectorAll(".toast");
         toasts.forEach((toast) => {
-            const bsToast = new bootstrap.Toast(toast);
-            bsToast.show();
+          const bsToast = new bootstrap.Toast(toast);
+          bsToast.show();
         });
-        
+
         // Initialize countdown and update every second
         updateCountdown();
         setInterval(updateCountdown, 1000);
-    });
-    
-    // Countdown Timer
-    function updateCountdown() {
+      });
+
+      // Countdown Timer
+      function updateCountdown() {
         try {
-            const endTimeStr = "[[${flashSaleEndTime}]]";
-            if (!endTimeStr) {
-                console.log("No end time available");
-                return;
-            }
-            
-            console.log("Flash Sale End Time:", endTimeStr);
-            
-            // Properly handle ISO format
-            const endTime = new Date(endTimeStr);
-            console.log("Parsed End Time:", endTime);
-            
-            const now = new Date();
-            const distance = endTime - now;
-            
-            if (distance < 0) {
-                console.log("Flash sale already ended");
-                document.getElementById("days").textContent = "00";
-                document.getElementById("hours").textContent = "00";
-                document.getElementById("minutes").textContent = "00";
-                document.getElementById("seconds").textContent = "00";
-                return;
-            }
-            
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-            
-            document.getElementById("days").textContent = days.toString().padStart(2, '0');
-            document.getElementById("hours").textContent = hours.toString().padStart(2, '0');
-            document.getElementById("minutes").textContent = minutes.toString().padStart(2, '0');
-            document.getElementById("seconds").textContent = seconds.toString().padStart(2, '0');
+          const endTimeStr = "[[${flashSaleEndTime}]]";
+          if (!endTimeStr) {
+            console.log("No end time available");
+            return;
+          }
+
+          console.log("Flash Sale End Time:", endTimeStr);
+
+          // Properly handle ISO format
+          const endTime = new Date(endTimeStr);
+          console.log("Parsed End Time:", endTime);
+
+          const now = new Date();
+          const distance = endTime - now;
+
+          if (distance < 0) {
+            console.log("Flash sale already ended");
+            document.getElementById("days").textContent = "00";
+            document.getElementById("hours").textContent = "00";
+            document.getElementById("minutes").textContent = "00";
+            document.getElementById("seconds").textContent = "00";
+            return;
+          }
+
+          const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+          const hours = Math.floor(
+            (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+          );
+          const minutes = Math.floor(
+            (distance % (1000 * 60 * 60)) / (1000 * 60)
+          );
+          const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+          document.getElementById("days").textContent = days
+            .toString()
+            .padStart(2, "0");
+          document.getElementById("hours").textContent = hours
+            .toString()
+            .padStart(2, "0");
+          document.getElementById("minutes").textContent = minutes
+            .toString()
+            .padStart(2, "0");
+          document.getElementById("seconds").textContent = seconds
+            .toString()
+            .padStart(2, "0");
         } catch (error) {
-            console.error("Error in countdown:", error);
+          console.error("Error in countdown:", error);
         }
-    }
-    
-    function showToast(title, message, type) {
+      }
+
+      function showToast(title, message, type) {
         // Create toast container if it doesn't exist
-        let toastContainer = document.querySelector('.toast-container');
+        let toastContainer = document.querySelector(".toast-container");
         if (!toastContainer) {
-            toastContainer = document.createElement('div');
-            toastContainer.className = 'toast-container';
-            document.body.appendChild(toastContainer);
+          toastContainer = document.createElement("div");
+          toastContainer.className = "toast-container";
+          document.body.appendChild(toastContainer);
         }
-        
+
         // Create toast element
-        const toast = document.createElement('div');
+        const toast = document.createElement("div");
         toast.className = `toast toast-${type} show`;
-        toast.setAttribute('role', 'alert');
-        toast.setAttribute('aria-live', 'assertive');
-        toast.setAttribute('aria-atomic', 'true');
-        
+        toast.setAttribute("role", "alert");
+        toast.setAttribute("aria-live", "assertive");
+        toast.setAttribute("aria-atomic", "true");
+
         // Create toast content
         toast.innerHTML = `
             <div class="toast-header">
-                <i class="fas fa-${type === 'success' ? 'check' : 'times'}-circle"></i>
+                <i class="fas fa-${
+                  type === "success" ? "check" : "times"
+                }-circle"></i>
                 <strong class="me-auto">${title}</strong>
                 <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
             <div class="toast-body">${message}</div>
         `;
-        
+
         // Add toast to container
         toastContainer.appendChild(toast);
-        
+
         // Auto remove after 5 seconds
         setTimeout(() => {
-            toast.remove();
+          toast.remove();
         }, 5000);
-    }
-</script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+      }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
 </html>
