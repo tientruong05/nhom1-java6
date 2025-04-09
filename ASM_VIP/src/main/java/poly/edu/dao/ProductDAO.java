@@ -199,8 +199,8 @@ class ProductDAOImpl implements ProductDAO {
                 });
         Optional.ofNullable(gender).filter(g -> !g.isEmpty())
                 .ifPresent(g -> {
-                    jpql.append(" AND p.subCategory.category.id = :genderId");
-                    countJpql.append(" AND p.subCategory.category.id = :genderId");
+                    jpql.append(" AND p.subCategory.subCategoriesName = :genderName");
+                    countJpql.append(" AND p.subCategory.subCategoriesName = :genderName");
                 });
         Optional.ofNullable(priceRange).filter(pr -> !pr.isEmpty())
                 .ifPresent(pr -> {
@@ -219,7 +219,10 @@ class ProductDAOImpl implements ProductDAO {
         Optional.ofNullable(search).filter(s -> !s.isEmpty())
                 .ifPresent(s -> query.setParameter("search", "%" + s + "%"));
         Optional.ofNullable(gender).filter(g -> !g.isEmpty())
-                .ifPresent(g -> query.setParameter("genderId", "male".equals(g) ? 1 : 2));
+                .ifPresent(g -> {
+                    String genderNameValue = "male".equals(g) ? "Đồng hồ nam" : "Đồng hồ nữ";
+                    query.setParameter("genderName", genderNameValue);
+                });
     }
 
     private Page<ProductEntity> createPage(String jpql, String countJpql, Pageable pageable, java.util.function.Consumer<jakarta.persistence.TypedQuery<?>> parameterSetter) {
