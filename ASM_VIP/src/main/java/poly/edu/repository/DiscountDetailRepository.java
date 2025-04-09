@@ -28,6 +28,12 @@ public interface DiscountDetailRepository extends JpaRepository<DiscountDetailEn
     @Query("SELECT dd FROM DiscountDetailEntity dd WHERE dd.subCategory.id = :subCategoryId AND dd.status = 1")
     List<DiscountDetailEntity> findBySubCategoryIdAndStatus(@Param("subCategoryId") int subCategoryId, @Param("status") int status);
 
+    @Query("SELECT dd.category.id FROM DiscountDetailEntity dd WHERE dd.discount.id = :discountId AND dd.status = 1 AND dd.category IS NOT NULL")
+    List<Integer> findCategoryIdsByDiscountId(@Param("discountId") int discountId);
+    
+    @Query("SELECT dd.subCategory.id FROM DiscountDetailEntity dd WHERE dd.discount.id = :discountId AND dd.status = 1 AND dd.subCategory IS NOT NULL")
+    List<Integer> findSubCategoryIdsByDiscountId(@Param("discountId") int discountId);
+
     List<DiscountDetailEntity> findByDiscount(DiscountEntity discount);
     @Transactional
     void deleteByDiscountId(int discountId);

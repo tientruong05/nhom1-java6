@@ -1,5 +1,7 @@
 package poly.edu.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import poly.edu.DTO.ProductDTO;
 import poly.edu.entity.DiscountEntity;
 
@@ -16,6 +18,9 @@ public interface FlashSaleService {
     
     // Lấy tất cả sản phẩm đang trong flash sale
     List<ProductDTO> getFlashSaleProducts();
+    
+    // Lấy tất cả sản phẩm đang trong flash sale (có phân trang)
+    Page<ProductDTO> getFlashSaleProductsPaged(Pageable pageable);
     
     // Lấy tối đa 4 sản phẩm flash sale cho trang chủ
     List<ProductDTO> getFlashSaleProductsForHomepage();
