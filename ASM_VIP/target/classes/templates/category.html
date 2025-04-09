@@ -168,6 +168,7 @@
                   <p class="product-price">
                     <span th:if="${product.discountPercentage != null}">
                       <span class="discount-price" th:text="${#numbers.formatDecimal(product.discountedPrice, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"></span>
+                      <br>
                       <span class="original-price" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"></span>
                     </span>
                     <span th:unless="${product.discountPercentage != null}" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}">Price</span>
