@@ -154,47 +154,75 @@
 			        width: 100%;
 			        padding: 40px 0;
 			      }
+				  #quarter {
+				      background: #111111;
+				      border: 1px solid #D4AF37;
+				      color: #fff;
+				      padding: 8px 16px;
+				      border-radius: 5px;
+				      margin-left: 10px;
+				  }
+
+				  #quarter:focus {
+				      background: #111111;
+				      border-color: #B4941E;
+				      box-shadow: 0 0 0 0.25rem rgba(212, 175, 55, 0.25);
+				      color: #fff;
+				  }
+
+				  label[for="quarter"] {
+				      color: #D4AF37;
+				  }
 			
         </style>
     </head>
-    <body>
-		<div class="section">
-		        <div class="container1">
-            <h1>10 KHÁCH HÀNG CỦA NĂM</h1>
+	<body>
+	        <div class="section">
+	            <div class="container1">
+	                <h1>TOP 10 KHÁCH HÀNG VIP</h1>
 
-            <form th:action="@{/java5/asm/statistics/customers}" method="get">
-                <label for="year">CHỌN NĂM:</label>
-                <input type="number" id="year" name="year" th:value="${selectedYear}" />
-                <button type="submit">LỌC</button>
-            </form>
+	                <form th:action="@{/java5/asm/statistics/customers}" method="get">
+	                    <label for="year">CHỌN NĂM:</label>
+	                    <input type="number" id="year" name="year" th:value="${selectedYear}" />
+	                    <label for="quarter" class="me-2">CHỌN QUÝ:</label>
+	                    <select id="quarter" name="quarter">
+	                        <option value="">Tất cả</option>
+	                        <option value="1" th:selected="${selectedQuarter == 1}">Quý 1</option>
+	                        <option value="2" th:selected="${selectedQuarter == 2}">Quý 2</option>
+	                        <option value="3" th:selected="${selectedQuarter == 3}">Quý 3</option>
+	                        <option value="4" th:selected="${selectedQuarter == 4}">Quý 4</option>
+	                    </select>
+	                    <button type="submit">LỌC</button>
+	                </form>
 
-            <div th:if="${not #lists.isEmpty(vipCustomersByYear)}">
-                <div th:each="year : ${vipCustomersByYear.keySet()}">
-                    <h2 th:text="'Năm: ' + ${year}"></h2>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Họ và tên</th>
-                                <th>Email</th>
-                                <th>Điện thoại</th>
-                                <th>Tổng số tiền</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="customer : ${vipCustomersByYear.get(year)}">
-                                <td th:text="${customer.fullName}"></td>
-                                <td th:text="${customer.email}"></td>
-                                <td th:text="${customer.phone}"></td>
-                                <td th:text="${customer.formattedTotalAmount}"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div th:unless="${not #lists.isEmpty(vipCustomersByYear)}">
-                <p class="no-data">Không có dữ liệu cho năm đã chọn.</p>
-            </div>
-        </div>
-		</div>
-    </body>
-</html>
+	                <div th:if="${not #lists.isEmpty(vipCustomersByYear)}">
+	                    <div th:each="period : ${vipCustomersByYear.keySet()}">
+	                        <h2 th:if="${selectedQuarter == null}" th:text="'Năm: ' + ${period}"></h2>
+	                        <h2 th:if="${selectedQuarter != null}" th:text="'Quý ' + ${period} + ' năm ' + ${selectedYear}"></h2>
+	                        <table>
+	                            <thead>
+	                                <tr>
+	                                    <th>Họ và tên</th>
+	                                    <th>Email</th>
+	                                    <th>Điện thoại</th>
+	                                    <th>Tổng số tiền</th>
+	                                </tr>
+	                            </thead>
+	                            <tbody>
+	                                <tr th:each="customer : ${vipCustomersByYear.get(period)}">
+	                                    <td th:text="${customer.fullName}"></td>
+	                                    <td th:text="${customer.email}"></td>
+	                                    <td th:text="${customer.phone}"></td>
+	                                    <td th:text="${customer.formattedTotalAmount}"></td>
+	                                </tr>
+	                            </tbody>
+	                        </table>
+	                    </div>
+	                </div>
+	                <div th:unless="${not #lists.isEmpty(vipCustomersByYear)}">
+	                    <p class="no-data">Không có dữ liệu cho lựa chọn này.</p>
+	                </div>
+	            </div>
+	        </div>
+	    </body>
+	</html>
