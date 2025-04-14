@@ -3,6 +3,8 @@ package poly.edu.Controller;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -59,17 +61,23 @@ public class CartController {
     @PostMapping("/cart/add/{productId}")
     @ResponseBody
     @Transactional
-    public String addToCart(@PathVariable("productId") int productId,
+    public ResponseEntity<String> addToCart(@PathVariable("productId") int productId,
                             @RequestParam("quantity") int quantity,
                             HttpSession session) {
         UserEntity user = (UserEntity) session.getAttribute("user");
-        if (user == null) return "redirect:/java5/asm/login";
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication required");
+        }
 
         String result = cartService.addItemToCart(user, productId, quantity);
         if (result.equals("success")) {
             session.setAttribute("cartCount", cartService.getCartCount(user.getId()));
+            return ResponseEntity.ok("success");
+        } else if (result.startsWith("error:")){
+            return ResponseEntity.badRequest().body(result);
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("error: Unexpected server error");
         }
-        return result;
     }
 
     @PostMapping("/cart/update")

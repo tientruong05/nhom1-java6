@@ -29,7 +29,11 @@ public class AuthController {
     private static final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@(.+)$";
 
     @GetMapping("/login")
-    public String loginForm() {
+    public String loginForm(@RequestParam(value = "redirectUrl", required = false) String redirectUrl, HttpSession session) {
+        // Store the redirect URL in the session if provided
+        if (redirectUrl != null && !redirectUrl.isEmpty()) {
+            session.setAttribute("redirectUrlAfterLogin", redirectUrl);
+        }
         return "login-register";
     }
 
@@ -50,6 +54,14 @@ public class AuthController {
                             .mapToInt(CartEntity::getQty).sum();
                     session.setAttribute("cartCount", cartCount);
 
+                    // Check for redirect URL first
+                    String redirectUrl = (String) session.getAttribute("redirectUrlAfterLogin");
+                    if (redirectUrl != null && !redirectUrl.isEmpty()) {
+                        session.removeAttribute("redirectUrlAfterLogin"); // Remove after use
+                        return "redirect:" + redirectUrl;
+                    }
+                    
+                    // Existing logic if no redirect URL
                     if (user.getFullName().isEmpty() && user.getAddress().isEmpty() && user.getPhone().isEmpty()) {
                         return "redirect:/java5/asm/profile";
                     }

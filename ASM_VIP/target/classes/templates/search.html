@@ -232,7 +232,9 @@
     <!-- Search Results -->
     <section class="collection-section">
       <div class="container">
-        <h2 class="section-title">Kết quả tìm kiếm cho: <span th:text="${search}"></span></h2>
+        <h2 class="section-title">
+          Kết quả tìm kiếm cho: <span th:text="${search}"></span>
+        </h2>
         <div class="row g-4">
           <th:block th:each="product : ${products}">
             <div class="col-md-3">
@@ -297,13 +299,29 @@
         <nav aria-label="Page navigation" th:if="${totalPages > 1}">
           <ul class="pagination justify-content-center">
             <!-- Nút Previous -->
-            <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
-              <a class="page-link" th:href="@{/java5/asm/search(q=${search}, page=${currentPage - 1}, size=${pageSize})}">Trước</a>
+            <li
+              class="page-item"
+              th:classappend="${currentPage == 0 ? 'disabled' : ''}"
+            >
+              <a
+                class="page-link"
+                th:href="@{/java5/asm/search(q=${search}, page=${currentPage - 1}, size=${pageSize})}"
+                >Trước</a
+              >
             </li>
 
             <!-- 3 trang đầu -->
-            <li class="page-item" th:each="i : ${#numbers.sequence(0, 2)}" th:if="${i < totalPages}" th:classappend="${currentPage == i} ? 'active'">
-              <a class="page-link" th:href="@{/java5/asm/search(q=${search}, page=${i}, size=${pageSize})}" th:text="${i + 1}"></a>
+            <li
+              class="page-item"
+              th:each="i : ${#numbers.sequence(0, 2)}"
+              th:if="${i < totalPages}"
+              th:classappend="${currentPage == i} ? 'active'"
+            >
+              <a
+                class="page-link"
+                th:href="@{/java5/asm/search(q=${search}, page=${i}, size=${pageSize})}"
+                th:text="${i + 1}"
+              ></a>
             </li>
 
             <!-- Dấu "..." nếu cần (trước các trang xung quanh trang hiện tại) -->
@@ -312,23 +330,51 @@
             </li>
 
             <!-- Các trang xung quanh trang hiện tại -->
-            <li class="page-item" th:each="i : ${#numbers.sequence(currentPage - 1, currentPage + 1)}" th:if="${i >= 3 and i < totalPages - 3 and i >= 0}" th:classappend="${currentPage == i} ? 'active'">
-              <a class="page-link" th:href="@{/java5/asm/search(q=${search}, page=${i}, size=${pageSize})}" th:text="${i + 1}"></a>
+            <li
+              class="page-item"
+              th:each="i : ${#numbers.sequence(currentPage - 1, currentPage + 1)}"
+              th:if="${i >= 3 and i < totalPages - 3 and i >= 0}"
+              th:classappend="${currentPage == i} ? 'active'"
+            >
+              <a
+                class="page-link"
+                th:href="@{/java5/asm/search(q=${search}, page=${i}, size=${pageSize})}"
+                th:text="${i + 1}"
+              ></a>
             </li>
 
             <!-- Dấu "..." nếu cần (sau các trang xung quanh trang hiện tại) -->
-            <li class="page-item" th:if="${totalPages > 6 and currentPage < totalPages - 4}">
+            <li
+              class="page-item"
+              th:if="${totalPages > 6 and currentPage < totalPages - 4}"
+            >
               <span class="page-link">...</span>
             </li>
 
             <!-- 3 trang cuối -->
-            <li class="page-item" th:each="i : ${#numbers.sequence(totalPages - 3, totalPages - 1)}" th:if="${totalPages > 3 and i >= 3}" th:classappend="${currentPage == i} ? 'active'">
-              <a class="page-link" th:href="@{/java5/asm/search(q=${search}, page=${i}, size=${pageSize})}" th:text="${i + 1}"></a>
+            <li
+              class="page-item"
+              th:each="i : ${#numbers.sequence(totalPages - 3, totalPages - 1)}"
+              th:if="${totalPages > 3 and i >= 3}"
+              th:classappend="${currentPage == i} ? 'active'"
+            >
+              <a
+                class="page-link"
+                th:href="@{/java5/asm/search(q=${search}, page=${i}, size=${pageSize})}"
+                th:text="${i + 1}"
+              ></a>
             </li>
 
             <!-- Nút Next -->
-            <li class="page-item" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
-              <a class="page-link" th:href="@{/java5/asm/search(q=${search}, page=${currentPage + 1}, size=${pageSize})}">Sau</a>
+            <li
+              class="page-item"
+              th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}"
+            >
+              <a
+                class="page-link"
+                th:href="@{/java5/asm/search(q=${search}, page=${currentPage + 1}, size=${pageSize})}"
+                >Sau</a
+              >
             </li>
           </ul>
         </nav>
@@ -384,7 +430,9 @@
       document.addEventListener("DOMContentLoaded", function () {
         if (document.getElementById("countdown")) {
           function startCountdown() {
-            const endTime = new Date("[[${flashSaleEndTime}]]".replace("T", " ")).getTime();
+            const endTime = new Date(
+              "[[${flashSaleEndTime}]]".replace("T", " ")
+            ).getTime();
             const countdownElement = document.getElementById("countdown");
 
             const interval = setInterval(() => {
@@ -398,11 +446,16 @@
               }
 
               const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-              const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-              const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+              const hours = Math.floor(
+                (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+              );
+              const minutes = Math.floor(
+                (distance % (1000 * 60 * 60)) / (1000 * 60)
+              );
               const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-              countdownElement.innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s";
+              countdownElement.innerHTML =
+                days + "d " + hours + "h " + minutes + "m " + seconds + "s";
             }, 1000);
           }
 

@@ -788,23 +788,49 @@
           },
           body: `quantity=${quantity}`,
         })
-          .then((response) => response.text())
+          .then((response) => {
+            if (response.status === 401) {
+              // Handle unauthorized (not logged in)
+              alert("Vui lòng đăng nhập để thêm vào giỏ hàng!");
+              // Add current page URL as redirect parameter
+              const currentPageUrl =
+                window.location.pathname + window.location.search;
+              const loginUrl = `/java5/asm/login?redirectUrl=${encodeURIComponent(
+                currentPageUrl
+              )}`;
+              window.location.href = loginUrl;
+              return Promise.reject("Unauthorized"); // Stop further processing
+            }
+            if (!response.ok) {
+              // Handle other errors (like 400 Bad Request, 500 Internal Server Error)
+              return response.text().then((text) => {
+                alert(
+                  text.startsWith("error:")
+                    ? text.substring(6)
+                    : "Có lỗi xảy ra: " + text
+                );
+                return Promise.reject("Server error"); // Stop further processing
+              });
+            }
+            // If response is OK (2xx), process the text body
+            return response.text();
+          })
           .then((result) => {
+            // This block only runs if the response was OK
             if (result === "success") {
               alert("Thêm vào giỏ hàng thành công!");
               updateCartCount();
-            } else if (result === "redirect:/java5/asm/login") {
-              alert("Vui lòng đăng nhập để thêm vào giỏ hàng!");
-              window.location.href = "/java5/asm/login";
-            } else if (result.startsWith("error:")) {
-              alert(result.substring(6));
             } else {
-              alert("Có lỗi không xác định xảy ra!");
+              // Should not happen if backend logic is correct, but handle defensively
+              alert("Có lỗi không xác định xảy ra! Phản hồi: " + result);
             }
           })
           .catch((error) => {
-            console.error("Error:", error);
-            alert("Có lỗi xảy ra khi thêm vào giỏ hàng!");
+            if (error !== "Unauthorized" && error !== "Server error") {
+              // Avoid double alert
+              console.error("Error:", error);
+              alert("Có lỗi xảy ra khi thêm vào giỏ hàng!");
+            }
           });
       }
 
