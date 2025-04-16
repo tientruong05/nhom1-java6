@@ -214,6 +214,138 @@
         background-color: #fff;
         color: #ccc;
       }
+      .product-card {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        height: 100%;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      }
+      .product-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
+      }
+      .product-img-container {
+        position: relative;
+        overflow: hidden;
+        padding-top: 100%;
+        background-color: #f5f6f7;
+      }
+      .product-img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+      }
+      .product-card:hover .product-img {
+        transform: scale(1.1);
+      }
+      .discount-badge {
+        position: absolute;
+        top: 0;
+        right: 0;
+        background-color: #e74c3c;
+        color: white;
+        padding: 8px 10px;
+        font-weight: bold;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      }
+      .discount-badge span:first-child {
+        font-size: 1.2rem;
+        font-weight: 700;
+        line-height: 1;
+      }
+      .discount-badge span:last-child {
+        font-size: 1rem;
+        font-weight: 600;
+      }
+      .product-card:hover .discount-badge {
+        transform: scale(1.05);
+        transition: transform 0.3s ease;
+      }
+      .product-info {
+        padding: 15px;
+        text-align: center;
+      }
+      .product-title {
+        color: #34495e;
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+        height: 2.4em;
+        overflow: hidden;
+      }
+      .product-price {
+        color: #e74c3c;
+        font-weight: bold;
+        font-size: 1.2rem;
+        margin-bottom: 0;
+      }
+      .product-price .original-price {
+        text-decoration: line-through;
+        color: #999;
+        font-size: 0.9rem;
+        font-weight: normal;
+        margin-left: 8px;
+      }
+      .product-price .discount-price {
+        color: #e74c3c;
+        font-weight: bold;
+      }
+      .quick-view-btn {
+        position: absolute;
+        bottom: -50px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: white;
+        color: black;
+        border: none;
+        border-radius: 5px;
+        padding: 8px 15px;
+        transition: all 0.3s ease;
+        opacity: 0;
+      }
+      .quick-view-btn:hover {
+        background-color: #e74c3c !important;
+        color: white !important;
+      }
+      .product-card:hover .quick-view-btn {
+        bottom: 20px;
+        opacity: 1;
+      }
+      .section-title {
+        color: #2c3e50;
+        margin-bottom: 30px;
+        font-weight: 700;
+        position: relative;
+        padding-bottom: 10px;
+        text-align: center;
+      }
+      .section-title::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 3px;
+        background-color: #3498db;
+      }
+      .product-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 30px;
+        padding: 0 15px;
+      }
+      
     </style>
     <link rel="stylesheet" th:href="@{/css/header.css}" />
     <link rel="stylesheet" th:href="@{/css/footer.css}" />
@@ -221,13 +353,13 @@
   <body>
     <div th:replace="fragments/header :: header"></div>
 
-    <!-- Flash Sale Section -->
+    <!-- Flash Sale Section 
     <section th:if="${isFlashSaleActive}" class="flash-sale-section">
       <div class="container">
         <h2>Flash Sale Đang Diễn Ra!</h2>
         <p>Thời gian còn lại: <span id="countdown"></span></p>
       </div>
-    </section>
+    </section> -->
 
     <!-- Search Results -->
     <section class="collection-section">
@@ -236,7 +368,56 @@
           Kết quả tìm kiếm cho: <span th:text="${search}"></span>
         </h2>
         <div class="row g-4">
-          <th:block th:each="product : ${products}">
+        <div class="col-md-3" th:each="product : ${products}">
+              <div class="product-card">
+                <div class="product-img-container">
+                  <div
+                    class="discount-badge"
+                    th:if="${product.discountPercentage != null}"
+                  >
+                    <span
+                      th:text="${#numbers.formatDecimal(product.discountPercentage, 0, 'POINT', 0, 'POINT') + '%'}"
+                      >20%</span
+                    >
+                    <span>OFF</span>
+                  </div>
+                  <img
+                    th:src="@{'/photos/' + ${product.image}}"
+                    class="product-img"
+                    alt="Watch"
+                  />
+                  <a
+                    class="quick-view-btn btn"
+                    th:href="@{'/java5/asm/products/detail/' + ${product.id}}"
+                    >Xem nhanh</a
+                  >
+                </div>
+                <div class="product-info">
+                  <h3 class="product-title" th:text="${product.name}">
+                    Watch Name
+                  </h3>
+                  <p class="product-price">
+                    <span th:if="${product.discountPercentage != null}">
+                      <span
+                        class="discount-price"
+                        th:text="${#numbers.formatDecimal(product.discountedPrice, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"
+                      ></span>
+                      <br />
+                      <span
+                        class="original-price"
+                        th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"
+                      ></span>
+                    </span>
+                    <span
+                      th:unless="${product.discountPercentage != null}"
+                      th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"
+                      >Price</span
+                    >
+                  </p>
+                </div>
+              </div>
+            </div>
+          <!-- <th:block th:each="product : ${products}">
             <div class="col-md-3">
               <div class="product-card position-relative">
                 <div
@@ -292,7 +473,7 @@
                 </div>
               </div>
             </div>
-          </th:block>
+          </th:block> -->
         </div>
 
         <!-- Phân trang -->
